@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Projeto: GRAPHFY - Gráficos com IA
+**Integrante**: Caue Fernandes
 
-## Getting Started
+---
 
-First, run the development server:
+### Visão Geral
+O **GRAPHFY** é uma aplicação web inteligente que permite a leitura e análise de planilhas para geração automatizada de gráficos, com auxílio de IA (LLaMA 3). A arquitetura do sistema segue o modelo cliente-servidor:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- O **front-end** é desenvolvido com **Next.js 14**.
+- O **back-end** é implementado em **Python** com **FastAPI**, usando o modelo LLaMA 3 como LLM.
+- O banco de dados principal é **PostgreSQL**, garantindo a persistência de dados.
+- A autenticação é feita via **JWT**, proporcionando segurança nas operações de login e controle de acesso.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Escopo
+A aplicação web permitirá:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Upload e leitura de planilhas
+- Geração de gráficos com auxílio da IA
+- Autenticação de usuários
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+### Arquitetura
+**API RESTful** baseada em uma **Arquitetura em Camadas**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+![image](https://github.com/user-attachments/assets/331937f5-53d9-4a41-aeab-b7a0fa84f85d)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+- **Front-end (Next.js 14)**  
+  Interface web interativa para os usuários.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Back-end (FastAPI + Python + LLaMA 3)**  
+  Processamento da lógica de negócio, leitura de planilhas e comunicação com o modelo de linguagem.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **Banco de Dados (PostgreSQL)**  
+  Armazenamento de usuários, planilhas e resultados processados.
+
+---
+
+### Tecnologias Utilizadas
+
+#### Front-end
+- Next.js 14 (App Router)
+- React Query ou SWR
+- Tailwind CSS
+- Axios
+- NextAuth.js
+
+#### Back-end
+- Python com FastAPI
+- LLaMA 3 (llm)
+- JWT
+- Pydantic (validação de dados)
+- TortoiseORM
+- PostgreSQL
+
+#### Banco de Dados
+- PostgreSQL
+
+---
+
+### Infraestrutura
+- **Front-end**: Vercel
+- **Back-end**: Railway
+- **Banco de Dados**:Railway
+
