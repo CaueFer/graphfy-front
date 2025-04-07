@@ -54,7 +54,7 @@ export const Message = ({
           >
             <div className="flex items-center space-x-2">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                {isUserMessage ? "Você" : "Resoomer"}
+                {isUserMessage ? "Você" : "GRAPHFY IA"}
               </span>
             </div>
 

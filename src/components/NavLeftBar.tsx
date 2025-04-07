@@ -39,7 +39,7 @@ export default function NavLeftBar() {
       <NavbarContent className="sm:hidden pr-3" justify="center">
         <NavbarBrand>
           <Link href="/" className="font-bold text-inherit">
-            RESOOOMER
+            GRAPHFY
           </Link>
           <Link />
         </NavbarBrand>
@@ -48,7 +48,7 @@ export default function NavLeftBar() {
       <NavbarContent className="hidden sm:flex gap-4 h-10" justify="center">
         <NavbarBrand>
           <Link href="/" className="font-bold text-inherit">
-            RESOOOMER
+            GRAPHFY
           </Link>
         </NavbarBrand>
       </NavbarContent>
@@ -56,11 +56,13 @@ export default function NavLeftBar() {
       <NavbarContent className="w-full gap-4 h-10 text-white" justify="center">
         <NavbarItem className="max-w-full flex flex-col text-center justify-center items-center truncate gap-4">
           <GalleryVerticalEnd className="size-10 text-white" />
-          <h3 className="font-semibold text-xl text-white  ">
-            Histórico de Chats
-          </h3>
+          <h3 className="font-semibold text-xl text-white  ">Suas conversas</h3>
           <p className="text-zinc-400 text-md text-pretty">
-            Faça LOGIN para ver histórico.
+            Faça{" "}
+            <span role="link" className="cursor-pointer">
+              LOGIN
+            </span>{" "}
+            para ver histórico.
           </p>
         </NavbarItem>
       </NavbarContent>

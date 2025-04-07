@@ -51,10 +51,16 @@ export const ChatWrapper = ({
 
   const generateQuestion = async (prompt: string) => {
     try {
+      await new Promise((resolver) => {
+        setTimeout(() => {
+          resolver(true);
+        }, 2000);
+      });
+
       setMessages((prev: Message[]) => [
         ...prev,
         {
-          content: "respota fake",
+          content: "recebi a mensagem!",
           role: "assistant",
           id: Math.random().toString(),
         },
