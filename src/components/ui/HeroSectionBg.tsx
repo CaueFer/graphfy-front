@@ -1,10 +1,11 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { motion, MotionValue } from "framer-motion";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const transition = {
-  duration: 0,
+  duration: 2000,
   ease: "linear",
 };
 
@@ -19,11 +20,21 @@ export const HeroSectionBg = ({
   description?: string;
   className?: string;
 }) => {
+  const router = useRouter();
+
+  const redirect = () => {
+    router.push("/chat");
+  };
+
   function scrollToForm() {
     const targetDiv = document.getElementById("targetDiv");
 
     if (targetDiv) {
       targetDiv.scrollIntoView({ behavior: "smooth" });
+
+      setTimeout(() => {
+        redirect();
+      }, 1000);
     }
   }
 
