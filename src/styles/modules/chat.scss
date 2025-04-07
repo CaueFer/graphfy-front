@@ -1,0 +1,32 @@
+.chatResponseText h1 {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+}
+
+.chatResponseText h2 {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+.chatResponseText a {
+  text-decoration: none;
+  color: #7ab7ff;
+  font-weight: 400;
+  text-decoration-line: none;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.chatResponseText a:hover {
+  color: #2563eb;
+  text-decoration: underline;
+  transform: scale(1.05);
+}
+
+.chatResponseText a:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.chatResponseText a:visited {
+  color: #2563eb;
+}
