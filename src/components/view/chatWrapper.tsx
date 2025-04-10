@@ -1,28 +1,30 @@
 "use client";
 
-import { Message, useChat } from "ai/react";
-import { Messages } from "./Messages";
-import { ChatInput } from "./ui/ChatInput";
-import NavLeftBar from "./NavLeftBar";
 import { useEffect, useState } from "react";
+
 import { v4 as uuidv4 } from "uuid";
+
+import { ChatInput } from "../ui/ChatInput";
+import NavLeftBar from "../NavLeftBar";
+import { Messages } from "./Messages";
+import { ChatMessage } from "./type";
 
 export const ChatWrapper = ({
   sessionId,
   initialMessages,
 }: {
   sessionId: string;
-  initialMessages: Message[];
+  initialMessages: ChatMessage[];
 }) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
   const [isInicialLoading, setIsInicialLoading] = useState(true);
 
   const [disableChatInput, setDisableChatInput] = useState(false);
 
-  const [formattedMessages, setFormattedMessages] = useState<Message[]>([]);
+  const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
 
   const [input, setInput] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
 
   const [error, setError] = useState<Error>();
 
@@ -32,54 +34,6 @@ export const ChatWrapper = ({
       return (prev = initialMessages);
     });
   }, [initialMessages]);
-
-  const handleSubmitInterceptor = () => {
-    setIsLoadingMessage(true);
-
-    setMessages((prev: Message[]) => [
-      ...prev,
-      {
-        content: input,
-        role: "user",
-        id: uuidv4(),
-      },
-    ]);
-
-    const inputWithInstruction = input + " responda tudo em pt-br.";
-    generateQuestion(inputWithInstruction);
-  };
-
-  const generateQuestion = async (prompt: string) => {
-    try {
-      await new Promise((resolver) => {
-        setTimeout(() => {
-          resolver(true);
-        }, 2000);
-      });
-
-      setMessages((prev: Message[]) => [
-        ...prev,
-        {
-          content: "recebi a mensagem!",
-          role: "assistant",
-          id: Math.random().toString(),
-        },
-      ]);
-    } catch (error) {
-      console.error("Erro ao enviar a mensagem:", error);
-
-      setMessages((prev: Message[]) => [
-        ...prev,
-        {
-          content: "Erro ao processar sua mensagem. Tente novamente.",
-          role: "error",
-          id: Math.random().toString(),
-        },
-      ]);
-    } finally {
-      setIsLoadingMessage(false);
-    }
-  };
 
   useEffect(() => {
     if (messages.at(-1)?.role !== "user") setIsLoadingMessage(false);
@@ -101,7 +55,7 @@ export const ChatWrapper = ({
       setIsLoadingMessage(false);
       setDisableChatInput(true);
 
-      setMessages((prev: Message[]) => [
+      setMessages((prev: ChatMessage[]) => [
         ...prev,
         {
           content: "Limite diário atingido!",
@@ -115,6 +69,54 @@ export const ChatWrapper = ({
   useEffect(() => {
     setDisableChatInput(false);
   }, []);
+
+  const handleSubmitInterceptor = () => {
+    setIsLoadingMessage(true);
+
+    setMessages((prev: ChatMessage[]) => [
+      ...prev,
+      {
+        content: input,
+        role: "user",
+        id: uuidv4(),
+      },
+    ]);
+
+    const inputWithInstruction = input + " responda tudo em pt-br.";
+    generateQuestion(inputWithInstruction);
+  };
+
+  const generateQuestion = async (prompt: string) => {
+    try {
+      await new Promise((resolver) => {
+        setTimeout(() => {
+          resolver(true);
+        }, 2000);
+      });
+
+      setMessages((prev: ChatMessage[]) => [
+        ...prev,
+        {
+          content: "recebi a mensagem!",
+          role: "assistant",
+          id: Math.random().toString(),
+        },
+      ]);
+    } catch (error) {
+      console.error("Erro ao enviar a mensagem:", error);
+
+      setMessages((prev: ChatMessage[]) => [
+        ...prev,
+        {
+          content: "Erro ao processar sua mensagem. Tente novamente.",
+          role: "error",
+          id: Math.random().toString(),
+        },
+      ]);
+    } finally {
+      setIsLoadingMessage(false);
+    }
+  };
 
   return (
     <div className="flex min-h-full min-w-screen">
@@ -142,9 +144,15 @@ export const ChatWrapper = ({
           }}
           handleSubmit={handleSubmitInterceptor}
           setInput={setInput}
-          disable={disableChatInput}
+          customPlaceholder={
+            formattedMessages.length < 1
+              ? "Envie sua planilha para iniciar o chat!"
+              : "Pergunte ao Graphfy..."
+          }
+          disable={disableChatInput || formattedMessages.length < 1}
         />
       </div>
+
     </div>
   );
 };

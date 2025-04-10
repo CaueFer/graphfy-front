@@ -1,6 +1,6 @@
 "use client";
 
-import { ChatWrapper } from "@/components/chatWrapper";
+import { ChatWrapper } from "@/components/view/chatWrapper";
 import { Message } from "ai";
 import React, { useEffect, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -26,15 +26,18 @@ const ChatbotPage = ({}: ChatbotPageProps) => {
 
   const generateIAResume = async () => {
     try {
-      setInitialMessages((prev: Message[]) => [
-        ...prev,
-        {
-          content:
-            "Olá bem vindo! Envie sua planilha para eu gerar os gráficos e tirar suas dúvidas.",
-          role: "assistant",
-          id: uuidv4(),
-        },
-      ]);
+      // buscar no backend se tem messagem
+      // setInitialMessages((prev: Message[]) => [
+      //   ...prev,
+      //   {
+      //     content:
+      //       "Olá bem vindo! Envie sua planilha para eu gerar os gráficos e tirar suas dúvidas.",
+      //     role: "assistant",
+      //     id: uuidv4(),
+      //   },
+      // ]);
+
+      setInitialMessages([]);
     } catch (error) {
       console.error("Erro ao gerar resumo:", error);
       setInitialMessages((prev: Message[]) => [

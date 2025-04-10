@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 const transition = {
-  duration: 1000,
+  duration: 2000,
   ease: "linear",
 };
 
@@ -34,7 +34,7 @@ export const HeroSectionBg = ({
 
       setTimeout(() => {
         redirect();
-      }, 500);
+      }, 1000);
     }
   }
 
