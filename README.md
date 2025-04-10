@@ -25,7 +25,8 @@ A aplicação web permitirá:
 ### Arquitetura
 **API RESTful** baseada em uma **Arquitetura em Camadas**:
 
-![image](https://github.com/user-attachments/assets/331937f5-53d9-4a41-aeab-b7a0fa84f85d)
+![image](https://github.com/user-attachments/assets/ea1bc5d0-935e-421a-86e9-3a4034f7ce4a)
+
 
 
 - **Front-end (Next.js 14)**  
