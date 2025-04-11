@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { ChatInput } from "../ui/ChatInput";
 import NavLeftBar from "../NavLeftBar";
-import { Messages } from "./Messages";
+import { MessagesContainer } from "./MessagesContainer";
 import { ChatMessage } from "./type";
 
 export const ChatWrapper = ({
@@ -18,6 +18,7 @@ export const ChatWrapper = ({
 }) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
   const [isInicialLoading, setIsInicialLoading] = useState(true);
+  const [isFileUploading, setIsFileUploading] = useState(true);
 
   const [disableChatInput, setDisableChatInput] = useState(false);
 
@@ -25,6 +26,7 @@ export const ChatWrapper = ({
 
   const [input, setInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [file, setFile] = useState<File | null>(null);
 
   const [error, setError] = useState<Error>();
 
@@ -69,6 +71,24 @@ export const ChatWrapper = ({
   useEffect(() => {
     setDisableChatInput(false);
   }, []);
+
+  const fileUpload = () => {
+    setIsFileUploading(true);
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("range", "0, 20");
+      formData.append("sessionId", sessionId);
+
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-spreadsheet`, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => console.log(response.json()))
+        .finally(() => setIsFileUploading(false));
+    } else setIsFileUploading(true);
+  };
 
   const handleSubmitInterceptor = () => {
     setIsLoadingMessage(true);
@@ -126,10 +146,13 @@ export const ChatWrapper = ({
 
       <div className="relative min-h-full flex-grow bg-zinc-900 flex divide-y divide-zinc-700 flex-col justify-between gap-2">
         <div className="flex-1 text-white bg-zinc-900 justify-between flex flex-col">
-          <Messages
+          <MessagesContainer
             messages={formattedMessages}
             isLoadingMessage={isLoadingMessage}
             isInicialLoading={isInicialLoading}
+            file={file}
+            setFile={setFile}
+            fileUpload={fileUpload}
           />
         </div>
 
@@ -152,7 +175,6 @@ export const ChatWrapper = ({
           disable={disableChatInput || formattedMessages.length < 1}
         />
       </div>
-
     </div>
   );
 };

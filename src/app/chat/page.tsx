@@ -1,14 +1,16 @@
 "use client";
 
-import { ChatWrapper } from "@/components/view/chatWrapper";
-import { Message } from "ai";
 import React, { useEffect, useMemo, useState } from "react";
+
 import { v4 as uuidv4 } from "uuid";
+
+import { ChatWrapper } from "@/components/view/chatWrapper";
+import { ChatMessage } from "@/components/view/type";
 
 interface ChatbotPageProps {}
 
 const ChatbotPage = ({}: ChatbotPageProps) => {
-  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+  const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
 
   const sessionId = useMemo(() => uuidv4().replace(/\//g, ""), []);
 
@@ -40,7 +42,7 @@ const ChatbotPage = ({}: ChatbotPageProps) => {
       setInitialMessages([]);
     } catch (error) {
       console.error("Erro ao gerar resumo:", error);
-      setInitialMessages((prev: Message[]) => [
+      setInitialMessages((prev: ChatMessage[]) => [
         ...prev,
         {
           content: "Erro ao processar sua mensagem. Tente novamente.",

@@ -1,8 +1,10 @@
 "use client";
-import { cn } from "@/lib/utils";
+
+import React from "react";
 import { motion, MotionValue } from "framer-motion";
 import { useRouter } from "next/navigation";
-import React from "react";
+
+import { cn } from "@/lib/utils";
 
 const transition = {
   duration: 2000,

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { Bot, ShieldX, User } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 
 interface MessageProps {
   content: string;
@@ -14,7 +13,10 @@ export const Message = ({
   isUserMessage = false,
   isErrorMessage = false,
 }: MessageProps) => {
-  const formatedContent = content.replace('```jsx', "").replace('```', "").trim();
+  const formatedContent = content
+    .replace("```jsx", "")
+    .replace("```", "")
+    .trim();
 
   return (
     <div

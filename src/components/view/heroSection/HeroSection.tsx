@@ -1,7 +1,9 @@
 "use client";
+
+import React, { useRef } from "react";
 import { useScroll, useTransform } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
-import { HeroSectionBg } from "./ui/HeroSectionBg";
+
+import { HeroSectionBg } from "./HeroSectionBg";
 
 interface HeroSectionProps {
   id: HTMLElement["id"];

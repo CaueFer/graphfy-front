@@ -1,6 +1,12 @@
 "use client";
 
-import { Dispatch, RefObject, useCallback, useState } from "react";
+import {
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useState,
+} from "react";
 
 import { FileUp, Sheet, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
@@ -9,32 +15,33 @@ import classNames from "classnames";
 import { acceptPlanilhas } from "@/lib/defaultConstants";
 
 interface DefaultDropzoneProps {
-  className?: string;
   ref?: RefObject<HTMLDivElement>;
-  setFile: Dispatch<any>;
-  file: any;
+  setFile: Dispatch<SetStateAction<File | null>>;
+  file: File | null;
+  fileUpload: VoidFunction;
 }
 export default function DefaultDropzone({
-  className,
   ref,
   setFile,
   file,
+  fileUpload,
 }: DefaultDropzoneProps) {
   const onDrop = useCallback((acceptedFiles: any[]) => {
     setFile(acceptedFiles[0]);
+
+    fileUpload();
   }, []);
 
-  const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
-    useDropzone({
-      onDrop,
-      accept: acceptPlanilhas,
-    });
+  const { fileRejections, getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: acceptPlanilhas,
+  });
 
   return (
     <div
-      ref={ref}
+      ref={ref ?? null}
       className={classNames(
-        "relative p-4 flex justify-center items-center rounded-lg w-[550px] h-[160px] border border-blue-400  hover:bg-blue-400/[0.05]  text-white text-sm  select-none",
+        "relative p-4 flex justify-center items-center rounded-lg w-[550px] h-[160px] border border-blue-400  hover:bg-blue-400/[0.05]  text-white text-sm  select-none group",
         {}
       )}
     >
@@ -45,7 +52,10 @@ export default function DefaultDropzone({
             className="absolute inset-0 w-full flex justify-center items-center cursor-pointer"
           >
             <div className="flex flex-col justify-center items-center gap-4 cursor-pointer">
-              <FileUp size={32} />
+              <FileUp
+                size={32}
+                className="group-hover:-translate-y-1 transition-transform duration-200 ease-in-out"
+              />
               <input {...getInputProps()} />
               <p className="text-center text-md">
                 Arraste e solte sua planilha aqui, ou clique para selecionar.

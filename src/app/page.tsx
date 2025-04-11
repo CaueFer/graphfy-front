@@ -1,9 +1,7 @@
 "use client";
 
-import { HeroSection } from "@/components/HeroSection";
 import NavTopBar from "@/components/NavTopBar";
-import { Button } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
+import { HeroSection } from "@/components/view/heroSection/HeroSection";
 
 export default function Home() {
   return (

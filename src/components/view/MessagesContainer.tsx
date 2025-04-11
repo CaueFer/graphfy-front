@@ -1,25 +1,29 @@
-import { useEffect, useRef, useState } from "react";
-import { BookCopy, MessageSquare } from "lucide-react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { MessageSquare } from "lucide-react";
 
 import DefaultDropzone from "../ui/Dropzone";
-import { ChatMessage } from "./type";
 import { Message } from "./Message";
+import { ChatMessage } from "./type";
 
-interface MessagesProps {
+interface MessagesContainerProps {
   messages: ChatMessage[];
   isLoadingMessage: boolean;
   isInicialLoading: boolean;
+  setFile: Dispatch<SetStateAction<File | null>>;
+  file: File | null;
+  fileUpload: () => void;
 }
 
-export const Messages = ({
+export const MessagesContainer = ({
   messages,
   isLoadingMessage,
+  file,
+  setFile,
+  fileUpload,
   isInicialLoading = false,
-}: MessagesProps) => {
+}: MessagesContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
-
-  const [file, setFile] = useState<any>(null);
 
   useEffect(() => {
     if (dropzoneRef?.current != null) {
@@ -70,9 +74,9 @@ export const Messages = ({
             <div className="w-full flex justify-center items-center gap-10 mt-5">
               <DefaultDropzone
                 ref={dropzoneRef}
-                className=""
                 setFile={setFile}
                 file={file}
+                fileUpload={fileUpload}
               />
             </div>
           </div>
