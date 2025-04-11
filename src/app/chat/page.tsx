@@ -4,8 +4,8 @@ import React, { useEffect, useMemo, useState } from "react";
 
 import { v4 as uuidv4 } from "uuid";
 
-import { ChatWrapper } from "@/components/view/chatWrapper";
-import { ChatMessage } from "@/components/view/type";
+import { ChatWrapper } from "@/app/view/chat/chatWrapper";
+import { ChatMessage } from "@/app/view/type";
 
 interface ChatbotPageProps {}
 

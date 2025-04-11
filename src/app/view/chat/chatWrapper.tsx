@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 
 import { v4 as uuidv4 } from "uuid";
 
-import { ChatInput } from "../ui/ChatInput";
-import NavLeftBar from "../NavLeftBar";
+import { ChatInput } from "../../../components/ui/ChatInput";
+import NavLeftBar from "../../../components/NavLeftBar";
 import { MessagesContainer } from "./MessagesContainer";
-import { ChatMessage } from "./type";
+import { ChatMessage } from "../type";
 
 export const ChatWrapper = ({
   sessionId,
@@ -18,7 +18,7 @@ export const ChatWrapper = ({
 }) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
   const [isInicialLoading, setIsInicialLoading] = useState(true);
-  const [isFileUploading, setIsFileUploading] = useState(true);
+  const [isFileUploading, setIsFileUploading] = useState(false);
 
   const [disableChatInput, setDisableChatInput] = useState(false);
 
@@ -72,7 +72,7 @@ export const ChatWrapper = ({
     setDisableChatInput(false);
   }, []);
 
-  const fileUpload = () => {
+  const fileUpload = async () => {
     setIsFileUploading(true);
 
     if (file) {
@@ -81,11 +81,14 @@ export const ChatWrapper = ({
       formData.append("range", "0, 20");
       formData.append("sessionId", sessionId);
 
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-spreadsheet`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-spreadsheet`, {
         method: "POST",
         body: formData,
       })
-        .then((response) => console.log(response.json()))
+        .then(async (response) => {
+          const data = await response.json();
+          console.log(data);
+        })
         .finally(() => setIsFileUploading(false));
     } else setIsFileUploading(true);
   };
@@ -153,6 +156,7 @@ export const ChatWrapper = ({
             file={file}
             setFile={setFile}
             fileUpload={fileUpload}
+            isFileUploading={isFileUploading}
           />
         </div>
 

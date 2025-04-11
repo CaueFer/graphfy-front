@@ -1,9 +1,13 @@
+"use client";
+
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { MessageSquare } from "lucide-react";
 
-import DefaultDropzone from "../ui/Dropzone";
-import { Message } from "./Message";
-import { ChatMessage } from "./type";
+import DefaultDropzone from "../../../components/ui/Dropzone";
+import { Message } from "../Message";
+import { ChatMessage } from "../type";
+import { Button } from "@nextui-org/react";
+import classNames from "classnames";
 
 interface MessagesContainerProps {
   messages: ChatMessage[];
@@ -12,6 +16,7 @@ interface MessagesContainerProps {
   setFile: Dispatch<SetStateAction<File | null>>;
   file: File | null;
   fileUpload: () => void;
+  isFileUploading: boolean;
 }
 
 export const MessagesContainer = ({
@@ -20,6 +25,7 @@ export const MessagesContainer = ({
   file,
   setFile,
   fileUpload,
+  isFileUploading,
   isInicialLoading = false,
 }: MessagesContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,13 +77,29 @@ export const MessagesContainer = ({
               Envie sua planilha para gerar seus primeiros gráficos.
             </p>
 
-            <div className="w-full flex justify-center items-center gap-10 mt-5">
+            <div className="w-full flex flex-col justify-center items-center gap-5 mt-5">
               <DefaultDropzone
                 ref={dropzoneRef}
                 setFile={setFile}
                 file={file}
-                fileUpload={fileUpload}
               />
+
+              <Button
+                color="primary"
+                variant="flat"
+                onClick={() => fileUpload()}
+                className={classNames(
+                  " bg-blue-600 duration-1000 ease-in-out ",
+                  {
+                    "opacity-0 -translate-y-2 ": !file,
+                    "opacity-1 translate-y-5 ": file,
+                    "animate-pulse": isFileUploading,
+                  }
+                )}
+                disabled={file == null || isFileUploading}
+              >
+                Enviar Planilha
+              </Button>
             </div>
           </div>
         </>

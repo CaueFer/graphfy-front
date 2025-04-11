@@ -18,18 +18,14 @@ interface DefaultDropzoneProps {
   ref?: RefObject<HTMLDivElement>;
   setFile: Dispatch<SetStateAction<File | null>>;
   file: File | null;
-  fileUpload: VoidFunction;
 }
 export default function DefaultDropzone({
   ref,
   setFile,
   file,
-  fileUpload,
 }: DefaultDropzoneProps) {
   const onDrop = useCallback((acceptedFiles: any[]) => {
     setFile(acceptedFiles[0]);
-
-    fileUpload();
   }, []);
 
   const { fileRejections, getRootProps, getInputProps } = useDropzone({

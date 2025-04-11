@@ -1,7 +1,7 @@
 "use client";
 
 import NavTopBar from "@/components/NavTopBar";
-import { HeroSection } from "@/components/view/heroSection/HeroSection";
+import { HeroSection } from "@/app/view/heroSection/HeroSection";
 
 export default function Home() {
   return (
