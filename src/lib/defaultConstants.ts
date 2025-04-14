@@ -7,4 +7,6 @@ const acceptPlanilhas = {
   "text/csv": [".csv"], // Planilhas CSV
 };
 
-export { acceptPlanilhas };
+const timeoutHeroTransition = 700;
+
+export { acceptPlanilhas, timeoutHeroTransition };

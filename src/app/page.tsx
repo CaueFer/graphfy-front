@@ -1,25 +1,20 @@
 "use client";
+import { useState } from "react";
 
 import NavTopBar from "@/components/NavTopBar";
 import { HeroSection } from "@/app/view/heroSection/HeroSection";
 
+import HeroTransition from "./view/heroSection/HeroTransition";
+
 export default function Home() {
+  const [redirect, setRedirected] = useState(false);
   return (
     <>
       <NavTopBar />
       <section className="flex min-h-screen max-w-screen flex-col items-center justify-center bg-black relative overflow-x-clip">
-        <HeroSection id="scrollDiv" />
+        <HeroSection id="scrollDiv"  setRedirected={setRedirected} />
 
-        <div className="relative w-full z-50 flex flex-col justify-center">
-          <div
-            id="targetDiv"
-            className="w-full flex flex-col justify-start gap-4 h-[100vh] px-14 py-[3.25rem] md:py-14 bg-transparent absolute bottom-0 z-50 bg-black backdrop-blur-sm snap-center"
-          >
-            {/* <div className="w-full flex justify-center items-center ">
-              <Button onClick={redirect}>Gerar Gráficos</Button>
-            </div> */}
-          </div>
-        </div>
+        <HeroTransition redirect={redirect}/>
       </section>
     </>
   );

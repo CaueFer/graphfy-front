@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { Dispatch, SetStateAction, useRef } from "react";
 import { useScroll, useTransform } from "framer-motion";
 
 import { HeroSectionBg } from "./HeroSectionBg";
 
 interface HeroSectionProps {
   id: HTMLElement["id"];
+  setRedirected: Dispatch<SetStateAction<boolean>>;
 }
 
-export function HeroSection({ id }: HeroSectionProps) {
+export function HeroSection({ id, setRedirected }: HeroSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -38,6 +39,7 @@ export function HeroSection({ id }: HeroSectionProps) {
           pathLengthFourth,
           pathLengthFifth,
         ]}
+        setRedirected={setRedirected}
       />
     </div>
   );

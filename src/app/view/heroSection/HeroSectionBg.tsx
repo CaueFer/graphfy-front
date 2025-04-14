@@ -1,27 +1,31 @@
 "use client";
 
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { motion, MotionValue } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
+import { timeoutHeroTransition } from "@/lib/defaultConstants";
 
 const transition = {
   duration: 2000,
   ease: "linear",
 };
 
+interface HeroSectionBgProps {
+  pathLengths: MotionValue[];
+  title?: string;
+  description?: string;
+  className?: string;
+  setRedirected: Dispatch<SetStateAction<boolean>>;
+}
 export const HeroSectionBg = ({
   pathLengths,
   title,
   description,
   className,
-}: {
-  pathLengths: MotionValue[];
-  title?: string;
-  description?: string;
-  className?: string;
-}) => {
+  setRedirected,
+}: HeroSectionBgProps) => {
   const router = useRouter();
 
   const redirect = () => {
@@ -33,10 +37,10 @@ export const HeroSectionBg = ({
 
     if (targetDiv) {
       targetDiv.scrollIntoView({ behavior: "smooth" });
-
+      setRedirected(true);
       setTimeout(() => {
         redirect();
-      }, 1000);
+      }, timeoutHeroTransition);
     }
   }
 
