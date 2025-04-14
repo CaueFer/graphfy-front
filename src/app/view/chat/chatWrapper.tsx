@@ -82,9 +82,6 @@ export const ChatWrapper = ({
 
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-spreadsheet`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: formData,
       })
         .then(async (response) => {
@@ -117,16 +114,30 @@ export const ChatWrapper = ({
       },
     ]);
 
-    const inputWithInstruction = input + " responda tudo em pt-br.";
-    generateQuestion(inputWithInstruction);
+    generateQuestion(input);
   };
 
   const generateQuestion = async (prompt: string) => {
     try {
-      await new Promise((resolver) => {
-        setTimeout(() => {
-          resolver(true);
-        }, 2000);
+      await fetch(process.env.NEXT_PUBLIC_API_URL + "/start-chat", {
+        method: "POST",
+        body: JSON.stringify({ prompt, sessionId }),
+      }).then((response) => {
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder("utf-8");
+
+        const read = () => {
+          reader?.read().then(({ done, value }) => {
+            if (done) return;
+
+            const chunk = decoder.decode(value, { stream: true });
+            console.log(chunk);
+
+            read();
+          });
+        };
+
+        read();
       });
 
       setMessages((prev: ChatMessage[]) => [

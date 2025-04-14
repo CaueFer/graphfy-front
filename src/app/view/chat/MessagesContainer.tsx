@@ -85,22 +85,24 @@ export const MessagesContainer = ({
                 file={file}
               />
 
-              <Button
-                color="primary"
-                variant="flat"
-                onClick={() => fileUpload()}
-                className={classNames(
-                  " bg-blue-600 duration-1000 ease-in-out ",
-                  {
-                    "opacity-0 -translate-y-2 ": !file,
-                    "opacity-1 translate-y-5 ": file,
-                    "animate-pulse": isFileUploading,
-                  }
-                )}
-                disabled={file == null || isFileUploading}
-              >
-                Enviar Planilha
-              </Button>
+              {(file || isFileUploading) && (
+                <Button
+                  color="primary"
+                  variant="flat"
+                  onClick={() => fileUpload()}
+                  className={classNames(
+                    " bg-blue-600 duration-1000 ease-in-out ",
+                    {
+                      "opacity-0 -translate-y-2 ": !file,
+                      "opacity-1 translate-y-5 ": file,
+                      "animate-pulse": isFileUploading,
+                    }
+                  )}
+                  disabled={file == null || isFileUploading}
+                >
+                  Enviar Planilha
+                </Button>
+              )}
             </div>
           </div>
         </>
