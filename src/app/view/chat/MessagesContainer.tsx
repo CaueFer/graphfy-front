@@ -2,12 +2,13 @@
 
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { MessageSquare } from "lucide-react";
-
-import DefaultDropzone from "../../../components/ui/Dropzone";
-import { Message } from "../Message";
-import { ChatMessage } from "../type";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
+
+import DefaultDropzone from "../../../components/ui/Dropzone";
+import { Message } from "./Message";
+
+import { ChatMessage } from "../type";
 
 interface MessagesContainerProps {
   messages: ChatMessage[];

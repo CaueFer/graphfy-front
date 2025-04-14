@@ -31,25 +31,24 @@ export const ChatWrapper = ({
   const [error, setError] = useState<Error>();
 
   useEffect(() => {
-    setMessages((prev) => {
-      if (initialMessages.length > 0) setIsInicialLoading(false);
-      return (prev = initialMessages);
-    });
+    if (initialMessages.length > 0) setIsInicialLoading(false);
+    setMessages((prev) => initialMessages);
   }, [initialMessages]);
 
   useEffect(() => {
-    if (messages.at(-1)?.role !== "user") setIsLoadingMessage(false);
+    const message = messages.at(-1);
 
-    const formatted = messages.map((message) => {
-      let content = message.content
+    if (message != null) {
+      if (messages.at(-1)?.role !== "user") setIsLoadingMessage(false);
+
+      const content = message.content
         .replace(/\*\*(.*?)\*\*/g, "<h2>$1</h2>")
-        .replace(/\n/g, "<br>")
+        .replace(/\n/g, "<br />")
         .replace(/\*(.*?)\*/g, "<strong>$1</strong>");
+      const formattedMessage = { ...message, content };
 
-      return { ...message, content: content };
-    });
-
-    setFormattedMessages(formatted);
+      setFormattedMessages((prev) => [...prev, formattedMessage]);
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -83,11 +82,24 @@ export const ChatWrapper = ({
 
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-spreadsheet`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: formData,
       })
         .then(async (response) => {
           const data = await response.json();
-          console.log(data);
+
+          if (data.success === true) {
+            setMessages((prev: ChatMessage[]) => [
+              ...prev,
+              {
+                content: `${data.message} \n\n ⛳ Dica: ${data.instructions}`,
+                role: "assistant",
+                id: Math.random().toString(),
+              },
+            ]);
+          }
         })
         .finally(() => setIsFileUploading(false));
     } else setIsFileUploading(true);
