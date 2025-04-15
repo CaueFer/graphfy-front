@@ -11,22 +11,24 @@ import { Message } from "./Message";
 import { ChatMessage } from "../type";
 
 interface MessagesContainerProps {
+  file: File | null;
+  messageStatus: string;
+  fileUpload: () => void;
   messages: ChatMessage[];
+  isFileUploading: boolean;
   isLoadingMessage: boolean;
   isInicialLoading: boolean;
   setFile: Dispatch<SetStateAction<File | null>>;
-  file: File | null;
-  fileUpload: () => void;
-  isFileUploading: boolean;
 }
 
 export const MessagesContainer = ({
   messages,
-  isLoadingMessage,
   file,
   setFile,
   fileUpload,
+  messageStatus,
   isFileUploading,
+  isLoadingMessage,
   isInicialLoading = false,
 }: MessagesContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,20 +55,31 @@ export const MessagesContainer = ({
       {messages.length ? (
         <>
           {messages.map((message, i) => (
-            <Message
-              key={i}
-              content={message.content}
-              isUserMessage={message.role === "user"}
-              isErrorMessage={message.role === "error"}
-              isLoadingMessage={message.role === "loading"}
-            />
+            <>
+              <Message
+                key={i}
+                content={message.content}
+                isUserMessage={message.role === "user"}
+                isErrorMessage={message.role === "error"}
+                isLoadingMessage={message.role === "loading"}
+              />
+            </>
           ))}
           {isLoadingMessage && (
-            <Message
-              key={"loading"}
-              content={"loading"}
-              isUserMessage={false}
-            />
+            <>
+              {messageStatus != "" && (
+                <div className="px-6 ">
+                  <div className="max-w-3xl mx-auto flex items-start">
+                    <h2 className=" statusTextGradient">{messageStatus}</h2>
+                  </div>
+                </div>
+              )}
+              <Message
+                key={"loading"}
+                content={"loading"}
+                isUserMessage={false}
+              />
+            </>
           )}
         </>
       ) : (

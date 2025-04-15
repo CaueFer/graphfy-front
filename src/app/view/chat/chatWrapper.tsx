@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 
 import { v4 as uuidv4 } from "uuid";
+import classNames from "classnames";
 
-import { ChatInput } from "../../../components/ui/ChatInput";
-import NavLeftBar from "../../../components/ui/navs/NavLeftBar";
+import useMessages from "@/lib/hooks/useMessages";
+import { ChatInput } from "@/components/ui/ChatInput";
+import NavLeftBar from "@/components/ui/navs/NavLeftBar";
 import { MessagesContainer } from "./MessagesContainer";
 import { ChatMessage } from "../type";
-import classNames from "classnames";
 
 export const ChatWrapper = ({
   sessionId,
@@ -28,8 +29,11 @@ export const ChatWrapper = ({
 
   const [input, setInput] = useState<string>("");
   const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  // const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const { messages, setMessages, setErrorMessage } = useMessages();
   const [file, setFile] = useState<File | null>(null);
+
+  const [messageStatus, setMessageStatus] = useState<string>("");
 
   const [error, setError] = useState<Error>();
 
@@ -120,13 +124,21 @@ export const ChatWrapper = ({
       },
     ]);
 
-    generateQuestion(input);
+    handleSendMessage(input);
   };
 
-  const generateQuestion = async (prompt: string) => {
+  const handleSendMessage = async (prompt: string) => {
     try {
+      // DELAY FAKE
+      await new Promise((resolve) =>
+        setTimeout(resolve, 10000 * Math.random())
+      );
+
       await fetch(process.env.NEXT_PUBLIC_API_URL + "/start-chat", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ prompt, sessionId }),
       }).then((response) => {
         const reader = response.body?.getReader();
@@ -137,7 +149,28 @@ export const ChatWrapper = ({
             if (done) return;
 
             const chunk = decoder.decode(value, { stream: true });
-            console.log(chunk);
+
+            const status = chunk.split("\n").filter((c) => c.trim() != "");
+
+            status.forEach((s) => {
+              const data = JSON.parse(s);
+
+              console.log(data);
+              if (data?.status != null) setMessageStatus(data.status);
+              else if (data?.error != null) setErrorMessage(data.error);
+              //FAZER UM TOAST PARA O ERRO
+
+              if (data?.success) {
+                setMessages((prev: ChatMessage[]) => [
+                  ...prev,
+                  {
+                    content: "recebi a mensagem!",
+                    role: "assistant",
+                    id: Math.random().toString(),
+                  },
+                ]);
+              }
+            });
 
             read();
           });
@@ -145,26 +178,10 @@ export const ChatWrapper = ({
 
         read();
       });
-
-      setMessages((prev: ChatMessage[]) => [
-        ...prev,
-        {
-          content: "recebi a mensagem!",
-          role: "assistant",
-          id: Math.random().toString(),
-        },
-      ]);
     } catch (error) {
       console.error("Erro ao enviar a mensagem:", error);
 
-      setMessages((prev: ChatMessage[]) => [
-        ...prev,
-        {
-          content: "Erro ao processar sua mensagem. Tente novamente.",
-          role: "error",
-          id: Math.random().toString(),
-        },
-      ]);
+      setErrorMessage();
     } finally {
       setIsLoadingMessage(false);
     }
@@ -172,6 +189,7 @@ export const ChatWrapper = ({
 
   return (
     <div className="flex min-h-full min-w-screen bg-zinc-900">
+      {/* LEFT BAR */}
       <div
         className={classNames(
           "min-h-full relative transition-all duration-500 ease-out -translate-x-[100%] bg-zinc-900",
@@ -195,6 +213,7 @@ export const ChatWrapper = ({
             setFile={setFile}
             fileUpload={fileUpload}
             isFileUploading={isFileUploading}
+            messageStatus={messageStatus}
           />
         </div>
 
