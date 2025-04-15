@@ -38,8 +38,6 @@ export const ChatWrapper = ({
 
   const [error, setError] = useState<Error>();
 
-  console.log(sessionId);
-
   useEffect(() => {
     if (initialMessages.length > 0) setIsInicialLoading(false);
     setMessages((prev) => initialMessages);
@@ -91,7 +89,7 @@ export const ChatWrapper = ({
       const formData = new FormData();
       formData.append("file", file);
       formData.append("range", "0, 20");
-      formData.append("sessionId", sessionId);
+      formData.append("sessionId", sessionId ?? "");
 
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-spreadsheet`, {
         method: "POST",

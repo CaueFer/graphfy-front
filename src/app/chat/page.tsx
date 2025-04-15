@@ -11,21 +11,22 @@ import useCookies from "@/lib/hooks/useCookies";
 interface ChatbotPageProps {}
 
 const ChatbotPage = ({}: ChatbotPageProps) => {
-  const sessionId = useCookies("sessioId");
-
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
+
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       getInitialMessages();
+
+      const getSessionId = async () => {
+        setSessionId(await useCookies("sessionId"));
+      };
+      getSessionId();
     } catch (error) {
       console.error("Erro ao reconstruir a URL:", error);
     }
   }, []);
-
-  useEffect(() => {
-    //console.log(initialMessages)
-  }, [initialMessages]);
 
   const getInitialMessages = async () => {
     try {
