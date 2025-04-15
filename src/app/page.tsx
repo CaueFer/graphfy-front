@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 
-import NavTopBar from "@/components/NavTopBar";
+import NavTopBar from "@/components/ui/navs/NavTopBar";
 import { HeroSection } from "@/app/view/heroSection/HeroSection";
 
 import HeroTransition from "./view/heroSection/HeroTransition";

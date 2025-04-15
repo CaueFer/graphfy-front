@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { ChatInput } from "../../../components/ui/ChatInput";
-import NavLeftBar from "../../../components/NavLeftBar";
+import NavLeftBar from "../../../components/ui/navs/NavLeftBar";
 import { MessagesContainer } from "./MessagesContainer";
 import { ChatMessage } from "../type";
+import classNames from "classnames";
 
 export const ChatWrapper = ({
   sessionId,
@@ -20,11 +21,13 @@ export const ChatWrapper = ({
   const [isInicialLoading, setIsInicialLoading] = useState(true);
   const [isFileUploading, setIsFileUploading] = useState(false);
 
+  const [leftBarOpen, setLeftBarOpen] = useState(false);
+  const [smallMenu, setSmallMenu] = useState(false);
+
   const [disableChatInput, setDisableChatInput] = useState(false);
 
-  const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
-
   const [input, setInput] = useState<string>("");
+  const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [file, setFile] = useState<File | null>(null);
 
@@ -69,6 +72,9 @@ export const ChatWrapper = ({
 
   useEffect(() => {
     setDisableChatInput(false);
+
+    const timer = setTimeout(() => setLeftBarOpen(true), 400);
+    return () => clearTimeout(timer);
   }, []);
 
   const fileUpload = async () => {
@@ -165,12 +171,21 @@ export const ChatWrapper = ({
   };
 
   return (
-    <div className="flex min-h-full min-w-screen">
-      <div className="min-h-full w-[285px]  relative">
-        <NavLeftBar />
+    <div className="flex min-h-full min-w-screen bg-zinc-900">
+      <div
+        className={classNames(
+          "min-h-full relative transition-all duration-500 ease-out -translate-x-[100%] bg-zinc-900",
+          {
+            "translate-x-0 ": leftBarOpen,
+            "w-[10vh]": smallMenu,
+            "w-[285px] ": !smallMenu,
+          }
+        )}
+      >
+        <NavLeftBar setSmallMenu={setSmallMenu} smallMenu={smallMenu} />
       </div>
 
-      <div className="relative min-h-full flex-grow bg-zinc-900 flex divide-y divide-zinc-700 flex-col justify-between gap-2">
+      <div className="relative min-h-full flex-grow bg-zinc-900 flex divide-y divide-zinc-700 flex-col justify-between gap-2 ">
         <div className="flex-1 text-white bg-zinc-900 justify-between flex flex-col">
           <MessagesContainer
             messages={formattedMessages}
