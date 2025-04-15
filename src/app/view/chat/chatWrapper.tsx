@@ -11,13 +11,14 @@ import NavLeftBar from "@/components/ui/navs/NavLeftBar";
 import { MessagesContainer } from "./MessagesContainer";
 import { ChatMessage } from "../type";
 
+interface ChatWrapperProps {
+  sessionId: string | null;
+  initialMessages: ChatMessage[];
+}
 export const ChatWrapper = ({
   sessionId,
   initialMessages,
-}: {
-  sessionId: string;
-  initialMessages: ChatMessage[];
-}) => {
+}: ChatWrapperProps) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
   const [isInicialLoading, setIsInicialLoading] = useState(true);
   const [isFileUploading, setIsFileUploading] = useState(false);
@@ -36,6 +37,8 @@ export const ChatWrapper = ({
   const [messageStatus, setMessageStatus] = useState<string>("");
 
   const [error, setError] = useState<Error>();
+
+  console.log(sessionId);
 
   useEffect(() => {
     if (initialMessages.length > 0) setIsInicialLoading(false);

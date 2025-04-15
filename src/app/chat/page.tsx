@@ -1,22 +1,23 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-
+import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
 
 import { ChatWrapper } from "@/app/view/chat/chatWrapper";
 import { ChatMessage } from "@/app/view/type";
+import useCookies from "@/lib/hooks/useCookies";
 
 interface ChatbotPageProps {}
 
 const ChatbotPage = ({}: ChatbotPageProps) => {
-  const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
+  const sessionId = useCookies("sessioId");
 
-  const sessionId = useMemo(() => uuidv4().replace(/\//g, ""), []);
+  const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
     try {
-      generateIAResume();
+      getInitialMessages();
     } catch (error) {
       console.error("Erro ao reconstruir a URL:", error);
     }
@@ -26,7 +27,7 @@ const ChatbotPage = ({}: ChatbotPageProps) => {
     //console.log(initialMessages)
   }, [initialMessages]);
 
-  const generateIAResume = async () => {
+  const getInitialMessages = async () => {
     try {
       // buscar no backend se tem messagem
       // setInitialMessages((prev: Message[]) => [
