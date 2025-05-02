@@ -35,7 +35,7 @@ export default function DefaultDropzone({
 
   return (
     <div
-      ref={ref ?? null}
+      ref={ref}
       className={classNames(
         "relative p-4 flex justify-center items-center rounded-lg w-[550px] h-[160px] border border-blue-400  hover:bg-blue-400/[0.05]  text-white text-sm  select-none group",
         {}

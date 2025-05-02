@@ -32,7 +32,7 @@ export const ChatInput = ({
   };
 
   return (
-    <div className="z-10 bg-zinc-900 absolte bottom-0 left-0 w-full">
+    <div className="z-10 bg-zinc-900 absolute bottom-0 left-0 w-full">
       <div className="mx-2 flex flex-row gap-3 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-2xl xl:max-w-3xl">
         <div className="relative flex h-full flex-1 items-stretch md:flex-col">
           <div className="relative flex flex-col w-full flex-grow p-4">

@@ -147,7 +147,10 @@ export const ChatWrapper = ({
 
         const read = () => {
           reader?.read().then(({ done, value }) => {
-            if (done) return;
+            if (done) {
+              setMessageStatus("");
+              return;
+            }
 
             const chunk = decoder.decode(value, { stream: true });
 
@@ -193,7 +196,7 @@ export const ChatWrapper = ({
       {/* LEFT BAR */}
       <div
         className={classNames(
-          "min-h-full relative transition-all duration-500 ease-out -translate-x-[100%] bg-zinc-900",
+          "min-h-full relative transition-all duration-500 ease-out -translate-x-[100%] bg-zinc-900 shadow z-20",
           {
             "translate-x-0 ": leftBarOpen,
             "w-[10vh]": smallMenu,

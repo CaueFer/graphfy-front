@@ -8,6 +8,5 @@ export default async function useCookies(
 
   const cookie = cookieStore.get(cookieKey);
 
-  console.log(cookie?.value);
   return cookie?.value ? cookie.value : null;
 }

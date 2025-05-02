@@ -54,10 +54,10 @@ export const MessagesContainer = ({
     >
       {messages.length ? (
         <>
-          {messages.map((message, i) => (
+          {messages.map((message) => (
             <>
               <Message
-                key={i}
+                key={message.id}
                 content={message.content}
                 isUserMessage={message.role === "user"}
                 isErrorMessage={message.role === "error"}
@@ -84,6 +84,7 @@ export const MessagesContainer = ({
         </>
       ) : (
         <>
+          {/* DROPZONE */}
           <div className="flex-1 flex flex-col items-center justify-center gap-2">
             <MessageSquare className="size-10 text-blue-500" />
             <h3 className="font-semibold text-2xl text-white">Tudo pronto!</h3>
