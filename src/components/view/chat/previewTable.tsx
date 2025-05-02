@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CircleSlash2 } from "lucide-react";
+import { numberToLetter } from "@/lib/defaultConstants";
 
 interface PreviewTableProps {
   fileName: string;
@@ -23,9 +23,37 @@ export default function PreviewTable({
           <div className="flex flex-col h-full overflow-hidden border-1 border-b-gray-500 rounded-xl">
             <Table>
               <TableHeader className="sticky top-0 bg-zinc-900 z-50">
+                {/* COLUMNS LETTER */}
+                <TableRow className="bg-zinc-800 ">
+                  {previewTable[0].map((_cell, i) => (
+                    <>
+                      {i == 0 && (
+                        <TableHead
+                          key={`head-${numberToLetter[i]}`}
+                          className="p-0"
+                        ></TableHead>
+                      )}
+                      <TableHead key={`head-${numberToLetter[i]}`}>
+                        {numberToLetter[i]}
+                      </TableHead>
+                    </>
+                  ))}
+                </TableRow>
+
+                {/* COLUMNS LABELS */}
                 <TableRow>
                   {previewTable[0].map((cell, i) => (
-                    <TableHead key={`head-${i}`}>{cell}</TableHead>
+                    <>
+                      {i == 0 && (
+                        <TableHead
+                          key={`head-first-${numberToLetter[i]}`}
+                          className="bg-zinc-800 p-0 text-center"
+                        >
+                          1
+                        </TableHead>
+                      )}
+                      <TableHead key={`head-${i}`}>{cell}</TableHead>
+                    </>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -34,9 +62,22 @@ export default function PreviewTable({
                   previewTable.slice(1).map((row, i) => (
                     <TableRow key={`tableRow-${i}`}>
                       {row.map((cell, j) => (
-                        <TableCell key={`tableCell-${j}-row-${i}`}>
-                          {cell}
-                        </TableCell>
+                        <>
+                          {/* ROWS NUMBERS */}
+                          {j === 0 && (
+                            <TableCell
+                              className="bg-zinc-800 p-0 text-center"
+                              key={`tableCell-first-${j}-row-${i}`}
+                            >
+                              {i + 2}
+                            </TableCell>
+                          )}
+
+                          {/* ROWS ITEMS */}
+                          <TableCell key={`tableCell-${j}-row-${i}`}>
+                            {cell}
+                          </TableCell>
+                        </>
                       ))}
                     </TableRow>
                   ))}
