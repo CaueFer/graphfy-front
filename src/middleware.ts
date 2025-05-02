@@ -1,6 +1,5 @@
+"use server";
 import { NextRequest, NextResponse } from "next/server";
-
-import crypto from "node:crypto";
 
 export function middleware(req: NextRequest) {
   const res = NextResponse.next();

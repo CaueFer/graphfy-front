@@ -1,14 +1,16 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useRef } from "react";
-import { MessageSquare } from "lucide-react";
-import { Button } from "@nextui-org/react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Columns3, MessageSquare } from "lucide-react";
+import { Button, Input } from "@nextui-org/react";
 import classNames from "classnames";
+import ExcelJS from "exceljs";
 
 import { DefaultDropzone } from "../../ui/Dropzone";
 import { Message } from "./Message";
 
 import { ChatMessage } from "./type";
+import PreviewTable from "./previewTable";
 
 interface MessagesContainerProps {
   file: File | null;
@@ -19,6 +21,7 @@ interface MessagesContainerProps {
   isLoadingMessage: boolean;
   isInicialLoading: boolean;
   setFile: Dispatch<SetStateAction<File | null>>;
+  setSmallMenu: Dispatch<SetStateAction<boolean>>;
 }
 
 export const MessagesContainer = ({
@@ -30,9 +33,16 @@ export const MessagesContainer = ({
   isFileUploading,
   isLoadingMessage,
   isInicialLoading = false,
+  setSmallMenu,
 }: MessagesContainerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
+
+  const [isLoadingPrewiew, setIsLoadingPreview] = useState(false);
+
+  const [workbook, setWorkbook] = useState<ExcelJS.Workbook | null>(null);
+  const [workbookSheets, setWorkbookSheets] = useState<string[] | null>(null);
+  const [previewTable, setPreviewTable] = useState<string[][] | null>(null);
 
   useEffect(() => {
     if (dropzoneRef?.current != null) {
@@ -47,12 +57,60 @@ export const MessagesContainer = ({
     }
   }, [messages]);
 
+  useEffect(() => {
+    renderWorksheet();
+  }, [workbook]);
+
+  const handleLoadPreviewTable = () => {
+    setIsLoadingPreview(true);
+    if (!file) return;
+
+    setWorkbook(null);
+    setWorkbookSheets(null);
+    setPreviewTable(null);
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const buffer = reader.result as ArrayBuffer;
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(buffer);
+      setWorkbook(workbook);
+
+      workbook.eachSheet((worksheet, _sheetId) => {
+        setWorkbookSheets((prev) =>
+          prev ? [...prev, worksheet.name] : [worksheet.name]
+        );
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const renderWorksheet = (worksheetNumber: number = 0) => {
+    if (workbook == null) return;
+
+    const worksheet = workbook.worksheets[worksheetNumber]; // pega a aba
+    const rows: string[][] = [];
+
+    worksheet.eachRow((row) => {
+      if (Array.isArray(row.values)) {
+        const stringifyArray: string[] = row.values.map((cell) => String(cell));
+
+        rows.push(stringifyArray.slice(1)); // remove o índice 0 q eh undefined por padrao
+      }
+    });
+
+    setIsLoadingPreview(false);
+    setSmallMenu(true);
+    setPreviewTable(rows);
+  };
+
   return (
     <div
       ref={containerRef}
       className="flex max-h-[calc(100vh-3.5rem-7rem)] flex-1 flex-col overflow-y-auto scroll-smooth"
     >
-      {messages.length ? (
+      {/* Messages */}
+      {messages.length > 0 && (
         <>
           {messages.map((message) => (
             <>
@@ -82,44 +140,111 @@ export const MessagesContainer = ({
             </>
           )}
         </>
-      ) : (
-        <>
-          {/* DROPZONE */}
-          <div className="flex-1 flex flex-col items-center justify-center gap-2">
-            <MessageSquare className="size-10 text-blue-500" />
-            <h3 className="font-semibold text-2xl text-white">Tudo pronto!</h3>
-            <p className="text-zinc-500 text-xl text-center">
-              Envie sua planilha para gerar seus primeiros gráficos.
+      )}
+
+      {/* DROPZONE */}
+      {messages.length < 1 && previewTable == null && (
+        <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <MessageSquare className="size-10 text-blue-500" />
+          <h3 className="font-semibold text-2xl text-white">Tudo pronto!</h3>
+          <p className="text-zinc-500 text-xl text-center">
+            Envie sua planilha para gerar seus primeiros gráficos.
+          </p>
+
+          <div className="w-full flex flex-col justify-center items-center gap-5 mt-5">
+            <DefaultDropzone ref={dropzoneRef} setFile={setFile} file={file} />
+
+            {file && (
+              <Button
+                color="primary"
+                variant="flat"
+                onClick={() => handleLoadPreviewTable()}
+                className={classNames(" bg-blue-600  ease-in-out ", {
+                  "opacity-0 -translate-y-2 ": !file,
+                  "opacity-1 translate-y-5 ": file,
+                  "animate-pulse": isLoadingPrewiew,
+                })}
+                disabled={isLoadingPrewiew}
+              >
+                {!isLoadingPrewiew ? (
+                  "Carregar Planilha"
+                ) : (
+                  <>
+                    Carregando
+                    <svg
+                      className="size-5 animate-spin text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Table Preview */}
+      {messages.length < 1 && previewTable != null && (
+        <div className="relative flex-1 flex flex-row items-center justify-center p-10 gap-7 overflow-hidden">
+          <div className="flex flex-col items-start justify-center gap-2">
+            <Columns3 className="size-10 text-blue-500" />
+            <h3 className="font-semibold text-2xl text-white">
+              Pré visualização da Planilha
+            </h3>
+            <p className="text-zinc-500 text-xl text-left">
+              Selecione o intervalo dos dados.
             </p>
 
-            <div className="w-full flex flex-col justify-center items-center gap-5 mt-5">
-              <DefaultDropzone
-                ref={dropzoneRef}
-                setFile={setFile}
-                file={file}
+            <div className="flex flex-row gap-2 justify-center items-center">
+              <Input
+                label="Inicio"
+                size="sm"
+                labelPlacement="inside"
+                placeholder="A:1"
               />
+              :
+              <Input
+                label="Fim"
+                size="sm"
+                labelPlacement="inside"
+                placeholder="Z:50"
+              />
+            </div>
 
-              {(file || isFileUploading) && (
-                <Button
-                  color="primary"
-                  variant="flat"
-                  onClick={() => fileUpload()}
-                  className={classNames(
-                    " bg-blue-600 duration-1000 ease-in-out ",
-                    {
-                      "opacity-0 -translate-y-2 ": !file,
-                      "opacity-1 translate-y-5 ": file,
-                      "animate-pulse": isFileUploading,
-                    }
-                  )}
-                  disabled={file == null || isFileUploading}
-                >
-                  Enviar Planilha
-                </Button>
-              )}
+            <div className="flex flex-col justify-start items-center">
+              {workbookSheets != null &&
+                workbookSheets.map((sheetNum, i) => (
+                  <Button
+                    key={`sheet-${sheetNum}-${i}`}
+                    onClick={() => renderWorksheet(i)}
+                  >
+                    Pagina {i} - {sheetNum}
+                  </Button>
+                ))}
             </div>
           </div>
-        </>
+
+          <PreviewTable
+            fileName={file?.name as string}
+            previewTable={previewTable}
+          />
+        </div>
       )}
     </div>
   );

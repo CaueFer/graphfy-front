@@ -216,6 +216,7 @@ export const ChatContainer = ({
             fileUpload={fileUpload}
             setFile={setFile}
             file={file}
+            setSmallMenu={setSmallMenu}
           />
         </div>
 

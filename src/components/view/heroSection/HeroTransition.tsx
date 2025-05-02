@@ -9,7 +9,7 @@ export default function HeroTransition({ redirect }: HeroTransitionProps) {
       <div
         id="targetDiv"
         className={classNames(
-          "w-full flex flex-col justify-start gap-4 h-[100vh] px-14 py-[3.25rem] md:py-14 absolute bottom-0 z-50 bg-zinc-900 backdrop-blur-sm snap-center opacity-0 transition-opacity duration-1000 ",
+          "w-full flex flex-col justify-start gap-4 h-[100vh] px-14 py-[3.25rem] md:py-14 absolute bottom-0 bg-zinc-900 backdrop-blur-sm snap-center opacity-0 transition-opacity duration-1000 ",
           {
             "opacity-100": redirect,
           }
