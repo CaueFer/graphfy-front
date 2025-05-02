@@ -1,16 +1,24 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { Columns3, MessageSquare } from "lucide-react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { MessageSquare, TableProperties } from "lucide-react";
 import { Button, Input } from "@nextui-org/react";
 import classNames from "classnames";
 import ExcelJS from "exceljs";
 
 import { DefaultDropzone } from "../../ui/Dropzone";
+import PreviewTable from "./previewTable";
 import { Message } from "./Message";
+import { Button as ButtonSd } from "@/components/ui/button";
 
 import { ChatMessage } from "./type";
-import PreviewTable from "./previewTable";
 
 interface MessagesContainerProps {
   file: File | null;
@@ -44,6 +52,8 @@ export const MessagesContainer = ({
   const [workbookSheets, setWorkbookSheets] = useState<string[] | null>(null);
   const [previewTable, setPreviewTable] = useState<string[][] | null>(null);
 
+  const [selectedSheet, setSelectedSheet] = useState<number>(0);
+
   useEffect(() => {
     if (dropzoneRef?.current != null) {
       dropzoneRef.current.focus();
@@ -61,9 +71,9 @@ export const MessagesContainer = ({
     renderWorksheet();
   }, [workbook]);
 
-  const handleLoadPreviewTable = () => {
-    setIsLoadingPreview(true);
+  const handleLoadPreviewTable = useCallback(() => {
     if (!file) return;
+    setIsLoadingPreview(true);
 
     setWorkbook(null);
     setWorkbookSheets(null);
@@ -83,10 +93,11 @@ export const MessagesContainer = ({
       });
     };
     reader.readAsArrayBuffer(file);
-  };
+  }, [file]);
 
   const renderWorksheet = (worksheetNumber: number = 0) => {
     if (workbook == null) return;
+    setIsLoadingPreview(true);
 
     const worksheet = workbook.worksheets[worksheetNumber]; // pega a aba
     const rows: string[][] = [];
@@ -183,7 +194,7 @@ export const MessagesContainer = ({
                         cy="12"
                         r="10"
                         stroke="currentColor"
-                        stroke-width="4"
+                        strokeWidth="4"
                       ></circle>
                       <path
                         className="opacity-75"
@@ -201,22 +212,24 @@ export const MessagesContainer = ({
 
       {/* Table Preview */}
       {messages.length < 1 && previewTable != null && (
-        <div className="relative flex-1 flex flex-row items-center justify-center p-10 gap-7 overflow-hidden">
+        <div className="relative flex-1 flex flex-row items-center justify-center p-10 overflow-hidden">
           <div className="flex flex-col items-start justify-center gap-2">
-            <Columns3 className="size-10 text-blue-500" />
+            <TableProperties className="size-10 text-blue-500" />
             <h3 className="font-semibold text-2xl text-white">
               Pré visualização da Planilha
             </h3>
-            <p className="text-zinc-500 text-xl text-left">
+            <p className="text-zinc-500 text-xl text-left mt-2">
               Selecione o intervalo dos dados.
             </p>
 
+            {/* RANGE INPUTS */}
             <div className="flex flex-row gap-2 justify-center items-center">
               <Input
                 label="Inicio"
                 size="sm"
                 labelPlacement="inside"
                 placeholder="A:1"
+                disabled={previewTable?.[0] == null}
               />
               :
               <Input
@@ -224,21 +237,34 @@ export const MessagesContainer = ({
                 size="sm"
                 labelPlacement="inside"
                 placeholder="Z:50"
+                disabled={previewTable?.[0] == null}
               />
             </div>
 
-            <div className="flex flex-col justify-start items-center">
+            {/* SHEETS */}
+            <div className="flex flex-col justify-start items-start gap-3 mt-6">
+              <p className="text-zinc-500 text-xl text-left">
+                Selecionar página —
+              </p>
               {workbookSheets != null &&
                 workbookSheets.map((sheetNum, i) => (
-                  <Button
+                  <ButtonSd
                     key={`sheet-${sheetNum}-${i}`}
-                    onClick={() => renderWorksheet(i)}
+                    onClick={() => {
+                      renderWorksheet(i);
+                      setSelectedSheet(i);
+                    }}
+                    variant="link"
+                    className="w-full justify-start"
+                    disabled={selectedSheet == i}
                   >
-                    Pagina {i} - {sheetNum}
-                  </Button>
+                    {sheetNum} - ({i + 1})
+                  </ButtonSd>
                 ))}
             </div>
           </div>
+
+          <div className="w-[2px] h-[50%] bg-muted mx-4" />
 
           <PreviewTable
             fileName={file?.name as string}
