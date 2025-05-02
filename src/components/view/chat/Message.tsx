@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { Bot, ShieldX, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MessageProps {
   content: string;

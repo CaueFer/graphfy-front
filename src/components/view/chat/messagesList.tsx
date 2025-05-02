@@ -5,10 +5,10 @@ import { MessageSquare } from "lucide-react";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
 
-import { DefaultDropzone } from "../../../components/ui/Dropzone";
+import { DefaultDropzone } from "../../ui/Dropzone";
 import { Message } from "./Message";
 
-import { ChatMessage } from "../type";
+import { ChatMessage } from "./type";
 
 interface MessagesContainerProps {
   file: File | null;

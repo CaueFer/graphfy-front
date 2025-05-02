@@ -5,20 +5,21 @@ import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import classNames from "classnames";
 
-import useMessages from "@/lib/hooks/useMessages";
 import { ChatInput } from "@/components/ui/ChatInput";
 import NavLeftBar from "@/components/ui/navs/NavLeftBar";
-import { MessagesContainer } from "./MessagesContainer";
-import { ChatMessage } from "../type";
+import { useMessages } from "@/lib/hooks/useMessages";
+import { ChatMessage } from "./type";
 
-interface ChatWrapperProps {
+import { MessagesContainer } from "./messagesList";
+
+interface ChatContainerProps {
   sessionId: string | null;
   initialMessages: ChatMessage[];
 }
-export const ChatWrapper = ({
+export const ChatContainer = ({
   sessionId,
   initialMessages,
-}: ChatWrapperProps) => {
+}: ChatContainerProps) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
   const [isInicialLoading, setIsInicialLoading] = useState(true);
   const [isFileUploading, setIsFileUploading] = useState(false);
@@ -27,14 +28,13 @@ export const ChatWrapper = ({
   const [smallMenu, setSmallMenu] = useState(false);
 
   const [disableChatInput, setDisableChatInput] = useState(false);
-
   const [input, setInput] = useState<string>("");
-  const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
-  // const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const { messages, setMessages, setErrorMessage } = useMessages();
-  const [file, setFile] = useState<File | null>(null);
 
+  const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
+  const { messages, setMessages, setErrorMessage } = useMessages();
   const [messageStatus, setMessageStatus] = useState<string>("");
+
+  const [file, setFile] = useState<File | null>(null);
 
   const [error, setError] = useState<Error>();
 
@@ -110,12 +110,10 @@ export const ChatWrapper = ({
           }
         })
         .finally(() => setIsFileUploading(false));
-    } else setIsFileUploading(true);
+    } else setIsFileUploading(false);
   };
 
-  const handleSubmitInterceptor = () => {
-    setIsLoadingMessage(true);
-
+  const handleSendMessageInitial = () => {
     setMessages((prev: ChatMessage[]) => [
       ...prev,
       {
@@ -125,10 +123,11 @@ export const ChatWrapper = ({
       },
     ]);
 
-    handleSendMessage(input);
+    handleSendMessageFinal(input);
   };
 
-  const handleSendMessage = async (prompt: string) => {
+  const handleSendMessageFinal = async (prompt: string) => {
+    setIsLoadingMessage(true);
     try {
       // DELAY FAKE
       await new Promise((resolve) =>
@@ -159,7 +158,6 @@ export const ChatWrapper = ({
             status.forEach((s) => {
               const data = JSON.parse(s);
 
-              console.log(data);
               if (data?.status != null) setMessageStatus(data.status);
               else if (data?.error != null) setErrorMessage(data.error);
               //FAZER UM TOAST PARA O ERRO
@@ -210,14 +208,14 @@ export const ChatWrapper = ({
       <div className="relative min-h-full flex-grow bg-zinc-900 flex divide-y divide-zinc-700 flex-col justify-between gap-2 ">
         <div className="flex-1 text-white bg-zinc-900 justify-between flex flex-col">
           <MessagesContainer
-            messages={formattedMessages}
             isLoadingMessage={isLoadingMessage}
             isInicialLoading={isInicialLoading}
-            file={file}
-            setFile={setFile}
-            fileUpload={fileUpload}
             isFileUploading={isFileUploading}
             messageStatus={messageStatus}
+            messages={formattedMessages}
+            fileUpload={fileUpload}
+            setFile={setFile}
+            file={file}
           />
         </div>
 
@@ -230,7 +228,7 @@ export const ChatWrapper = ({
           ) => {
             setInput(e.target.value);
           }}
-          handleSubmit={handleSubmitInterceptor}
+          handleSubmit={handleSendMessageInitial}
           setInput={setInput}
           customPlaceholder={
             formattedMessages.length < 1

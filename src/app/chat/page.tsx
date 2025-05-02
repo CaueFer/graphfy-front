@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { cookies } from "next/headers";
+import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { ChatWrapper } from "@/app/view/chat/chatWrapper";
-import { ChatMessage } from "@/app/view/type";
+import { ChatContainer } from "@/components/view/chat/chatContainer";
+import { ChatMessage } from "@/components/view/chat/type";
 import useCookies from "@/lib/hooks/useCookies";
 
-interface ChatbotPageProps {}
+interface ChatPageProps {}
 
-const ChatbotPage = ({}: ChatbotPageProps) => {
+const ChatPage = ({}: ChatPageProps) => {
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
 
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -22,9 +21,10 @@ const ChatbotPage = ({}: ChatbotPageProps) => {
       const getSessionId = async () => {
         setSessionId(await useCookies("sessionId"));
       };
+      
       getSessionId();
     } catch (error) {
-      console.error("Erro ao reconstruir a URL:", error);
+      console.error("Erro get sessionId:", error);
     }
   }, []);
 
@@ -56,7 +56,7 @@ const ChatbotPage = ({}: ChatbotPageProps) => {
   };
 
   return (
-    <ChatWrapper
+    <ChatContainer
       key={sessionId}
       sessionId={sessionId}
       initialMessages={initialMessages}
@@ -64,4 +64,4 @@ const ChatbotPage = ({}: ChatbotPageProps) => {
   );
 };
 
-export default ChatbotPage;
+export default ChatPage;

@@ -2,9 +2,9 @@
 import { useState } from "react";
 
 import NavTopBar from "@/components/ui/navs/NavTopBar";
-import { HeroSection } from "@/app/view/heroSection/HeroSection";
+import { HeroSection } from "@/components/view/heroSection/HeroSection";
 
-import HeroTransition from "./view/heroSection/HeroTransition";
+import HeroTransition from "../components/view/heroSection/HeroTransition";
 
 export default function Home() {
   const [redirect, setRedirected] = useState(false);
@@ -12,9 +12,9 @@ export default function Home() {
     <>
       <NavTopBar />
       <section className="flex min-h-screen max-w-screen flex-col items-center justify-center bg-black relative overflow-x-clip">
-        <HeroSection id="scrollDiv"  setRedirected={setRedirected} />
+        <HeroSection id="scrollDiv" setRedirected={setRedirected} />
 
-        <HeroTransition redirect={redirect}/>
+        <HeroTransition redirect={redirect} />
       </section>
     </>
   );

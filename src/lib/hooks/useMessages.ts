@@ -1,7 +1,7 @@
-import { ChatMessage } from "@/app/view/type";
+import { ChatMessage } from "@/components/view/chat/type";
 import { useState } from "react";
 
-export default function () {
+export function useMessages() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const setErrorMessage = (message: string = "") => {
@@ -13,7 +13,7 @@ export default function () {
             ? message
             : "Erro ao processar sua mensagem. Tente novamente.",
         role: "error",
-        id: Math.random().toString(),
+        id: `error-${Math.random()}`,
       },
     ]);
   };
