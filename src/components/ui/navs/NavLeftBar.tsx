@@ -17,6 +17,7 @@ import {
   PanelRightClose,
   SlidersVertical,
 } from "lucide-react";
+import { Button as ButtonSd } from "@/components/ui/button";
 
 const NavConfigModal = lazy(() => {
   return import("./navConfigModal");
@@ -87,21 +88,37 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
       <NavbarContent className="w-full gap-4 h-10 text-white" justify="center">
         <NavbarItem className="max-w-full flex flex-col text-center justify-center items-center truncate gap-4">
           <Tooltip
-            content="Suas conversas, faça login para ver."
+            content={
+              <p className="text-black text-md text-pretty">
+                Suas conversas. Faça
+                <ButtonSd
+                  variant="link"
+                  role="link"
+                  className="cursor-pointer px-1"
+                >
+                  LOGIN
+                </ButtonSd>
+                para ver histórico.
+              </p>
+            }
             placement="right"
           >
             <GalleryVerticalEnd className="size-10 text-white" />
           </Tooltip>
           {!smallMenu && (
             <>
-              <h3 className="font-semibold text-xl text-white  ">
+              <h3 className="font-semibold text-xl text-white ">
                 Suas conversas
               </h3>
               <p className="text-zinc-400 text-md text-pretty">
-                Faça{" "}
-                <span role="link" className="cursor-pointer">
+                Faça
+                <ButtonSd
+                  variant="link"
+                  role="link"
+                  className="cursor-pointer px-1"
+                >
                   LOGIN
-                </span>{" "}
+                </ButtonSd>
                 para ver histórico.
               </p>
             </>
