@@ -1,11 +1,11 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 import { MessageSquare } from "lucide-react";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
 
-import DefaultDropzone from "../../../components/ui/Dropzone";
+import { DefaultDropzone } from "../../../components/ui/Dropzone";
 import { Message } from "./Message";
 
 import { ChatMessage } from "../type";
@@ -75,7 +75,7 @@ export const MessagesContainer = ({
                 </div>
               )}
               <Message
-                key={"loading"}
+                key={`loading-${Date.now()}`}
                 content={"loading"}
                 isUserMessage={false}
               />

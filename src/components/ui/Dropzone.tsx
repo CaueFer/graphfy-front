@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Dispatch,
-  RefObject,
-  SetStateAction,
-  useCallback,
-  useState,
-} from "react";
+import React, { Dispatch, SetStateAction, useCallback } from "react";
 
 import { FileUp, Sheet, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
@@ -15,15 +9,13 @@ import classNames from "classnames";
 import { acceptPlanilhas } from "@/lib/defaultConstants";
 
 interface DefaultDropzoneProps {
-  ref?: RefObject<HTMLDivElement>;
   setFile: Dispatch<SetStateAction<File | null>>;
   file: File | null;
 }
-export default function DefaultDropzone({
-  ref,
-  setFile,
-  file,
-}: DefaultDropzoneProps) {
+export const DefaultDropzone = React.forwardRef<
+  HTMLDivElement,
+  DefaultDropzoneProps
+>(({ setFile, file }, ref) => {
   const onDrop = useCallback((acceptedFiles: any[]) => {
     setFile(acceptedFiles[0]);
   }, []);
@@ -82,4 +74,4 @@ export default function DefaultDropzone({
       )}
     </div>
   );
-}
+});
