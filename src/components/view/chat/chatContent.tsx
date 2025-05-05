@@ -20,7 +20,7 @@ import { Button as ButtonSd } from "@/components/ui/button";
 
 import { ChatMessage } from "./type";
 
-interface MessagesContainerProps {
+interface ChatContentProps {
   file: File | null;
   messageStatus: string;
   fileUpload: () => void;
@@ -32,7 +32,7 @@ interface MessagesContainerProps {
   setSmallMenu: Dispatch<SetStateAction<boolean>>;
 }
 
-export const MessagesContainer = ({
+export const ChatContent = ({
   messages,
   file,
   setFile,
@@ -42,7 +42,7 @@ export const MessagesContainer = ({
   isLoadingMessage,
   isInicialLoading = false,
   setSmallMenu,
-}: MessagesContainerProps) => {
+}: ChatContentProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
 
@@ -262,6 +262,47 @@ export const MessagesContainer = ({
                   </ButtonSd>
                 ))}
             </div>
+
+            <Button
+              color="primary"
+              variant="flat"
+              size="lg"
+              className={classNames("w-[200px] bg-blue-600 ease-in-out mx-auto mt-10 ", {
+                "opacity-0 -translate-y-2 ": !file,
+                "opacity-1 translate-y-5 ": file,
+                "animate-pulse": isFileUploading,
+              })}
+              onClick={() => null}
+              disabled={isFileUploading}
+            >
+              {!isFileUploading ? (
+                "Enviar Intervalo"
+              ) : (
+                <>
+                  Enviando
+                  <svg
+                    className="size-5 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                </>
+              )}
+            </Button>
           </div>
 
           <div className="w-[2px] h-[50%] bg-muted mx-4" />

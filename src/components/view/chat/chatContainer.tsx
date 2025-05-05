@@ -8,9 +8,9 @@ import classNames from "classnames";
 import { ChatInput } from "@/components/ui/ChatInput";
 import NavLeftBar from "@/components/ui/navs/NavLeftBar";
 import { useMessages } from "@/lib/hooks/useMessages";
-import { ChatMessage } from "./type";
+import { ChatContent } from "./chatContent";
 
-import { MessagesContainer } from "./messagesList";
+import { ChatMessage } from "./type";
 
 interface ChatContainerProps {
   sessionId: string | null;
@@ -207,7 +207,7 @@ export const ChatContainer = ({
 
       <div className="relative min-h-full flex-grow bg-zinc-900 flex divide-y divide-zinc-700 flex-col justify-between gap-2 ">
         <div className="flex-1 text-white bg-zinc-900 justify-between flex flex-col">
-          <MessagesContainer
+          <ChatContent
             isLoadingMessage={isLoadingMessage}
             isInicialLoading={isInicialLoading}
             isFileUploading={isFileUploading}
