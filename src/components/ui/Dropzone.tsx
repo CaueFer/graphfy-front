@@ -18,8 +18,6 @@ export const DefaultDropzone = React.forwardRef<
   DefaultDropzoneProps
 >(({ setFile, file, disabled = false }, ref) => {
   const onDrop = useCallback((acceptedFiles: any[]) => {
-    if (disabled) return;
-
     setFile(acceptedFiles[0]);
   }, []);
 

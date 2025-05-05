@@ -47,7 +47,7 @@ export const ChatContent = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
 
-  const [isRender, setIsRender] = useState(false);
+  const [isRender, setIsRender] = useState(true);
   const [isLoadingPrewiew, setIsLoadingPreview] = useState(false);
 
   const [workbook, setWorkbook] = useState<ExcelJS.Workbook | null>(null);
@@ -62,7 +62,7 @@ export const ChatContent = ({
       dropzoneRef.current.focus();
     }
 
-    setIsRender(true);
+    setIsRender(false);
   }, []);
 
   useEffect(() => {
@@ -187,7 +187,7 @@ export const ChatContent = ({
               ref={dropzoneRef}
               setFile={setFile}
               file={file}
-              disabled={true}
+              disabled={isRender}
             />
 
             {file && (
