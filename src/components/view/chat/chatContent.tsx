@@ -126,6 +126,8 @@ export const ChatContent = ({
 
     setIsLoadingPreview(false);
     setSmallMenu(true);
+
+    // DADOS PARA O COMPONENT DA TABELA
     setPreviewTable(rows);
   };
 

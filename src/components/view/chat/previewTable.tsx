@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
 import {
   Table,
   TableBody,
@@ -16,22 +20,52 @@ export default function PreviewTable({
   fileName,
   previewTable,
 }: PreviewTableProps) {
+  const tableBodyScroll = useRef<HTMLTableElement>(null);
+  const [activeRows, setActiveRows] = useState(previewTable?.slice(0, 15));
+
+  useEffect(() => {
+    const tableBody = tableBodyScroll.current;
+    if (!tableBody) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = tableBody;
+
+      if (scrollTop + clientHeight >= scrollHeight - 5) {
+        loadMoreRows();
+      }
+    };
+
+    tableBody.addEventListener("scroll", handleScroll);
+    return () => tableBody.removeEventListener("scroll", handleScroll);
+  }, [activeRows]);
+
+  useEffect(() => {
+    setActiveRows(previewTable?.slice(0, 15));
+  }, [previewTable]);
+
+  const loadMoreRows = () => {
+    setActiveRows((prev) => {
+      if (!prev || !previewTable) return;
+
+      const currentLength = prev.length;
+      const nextRows = previewTable.slice(currentLength, currentLength + 15);
+      return [...prev, ...nextRows];
+    });
+  };
+
   return (
     <div className="relative flex flex-col h-full w-[60%]">
       {previewTable?.[0] != null ? (
         <>
           <div className="flex flex-col h-full overflow-hidden border-1 border-b-gray-500 rounded-xl">
-            <Table>
+            <Table ref={tableBodyScroll}>
               <TableHeader className="sticky top-0 bg-zinc-900 z-50">
                 {/* COLUMNS LETTER */}
                 <TableRow className="bg-zinc-800 ">
                   {previewTable[0].map((_cell, i) => (
                     <>
                       {i == 0 && (
-                        <TableHead
-                          key={`head-${numberToLetter[i]}`}
-                          className="p-0"
-                        ></TableHead>
+                        <TableHead key={`head-0`} className="p-0"></TableHead>
                       )}
                       <TableHead key={`head-${numberToLetter[i]}`}>
                         {numberToLetter[i]}
@@ -58,8 +92,8 @@ export default function PreviewTable({
                 </TableRow>
               </TableHeader>
               <TableBody className="relative overflow-scroll">
-                {previewTable != null &&
-                  previewTable.slice(1).map((row, i) => (
+                {activeRows != null &&
+                  activeRows.slice(1).map((row, i) => (
                     <TableRow key={`tableRow-${i}`}>
                       {row.map((cell, j) => (
                         <>
