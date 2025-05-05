@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { numberToLetter } from "@/lib/defaultConstants";
 
-const selectedRowColor = ["hover:bg-muted", "hover:hover:bg-muted/50"];
+const selectedRowColor = ["bg-muted/50", "hover:bg-muted/50"];
 
 interface PreviewTableProps {
   fileName: string;
@@ -22,15 +22,13 @@ export default function PreviewTable({
   fileName,
   previewTable,
 }: PreviewTableProps) {
-  const gridContainer = useRef<HTMLDivElement>(null);
-
   const tableBodyScroll = useRef<HTMLTableElement>(null);
   const [activeRows, setActiveRows] = useState(previewTable?.slice(0, 15));
 
   const [isDragging, setIsDragging] = useState(false);
-  const [selectedRows, setSelectedRows] = useState<HTMLDivElement[]>([]);
   const startCellRef = useRef<HTMLTableCellElement | null>(null);
-  const selectedCellsRef = useRef<Set<HTMLTableCellElement>>(new Set());
+  const [selectedCells, setSelectedCell] = useState<Record<string, any>[]>([]);
+  const selectedCellsRefs = useRef<HTMLTableCellElement[]>([]);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -56,9 +54,23 @@ export default function PreviewTable({
 
   useEffect(() => {
     const handleGlobalMouseUp = () => setIsDragging(false);
+
     window.addEventListener("mouseup", handleGlobalMouseUp);
     return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
   }, []);
+
+  useEffect(() => {
+    if (selectedCells.length > 0) {
+      const initialRow = selectedCells[0].row;
+      const initialCol = selectedCells[0].col;
+
+      const finalRow = selectedCells[selectedCells.length - 1].row;
+      const finalCol = selectedCells[selectedCells.length - 1].col;
+
+      console.log("Inicio", initialCol + ":" + initialRow);
+      console.log("Inicio", finalCol + ":" + finalRow);
+    }
+  }, [selectedCells]);
 
   const loadMoreRows = () => {
     setActiveRows((prev) => {
@@ -71,10 +83,12 @@ export default function PreviewTable({
   };
 
   const clearSelection = () => {
-    selectedCellsRef.current.forEach((cell) => {
+    selectedCellsRefs.current.forEach((cell) => {
       cell.classList.remove(...selectedRowColor);
     });
-    selectedCellsRef.current.clear();
+
+    setSelectedCell([]);
+    selectedCellsRefs.current = [];
   };
 
   const selectCellsInRange = (
@@ -112,8 +126,14 @@ export default function PreviewTable({
         const cell = cells[j];
         if (cell) {
           cell.classList.add(...selectedRowColor);
+          selectedCellsRefs.current.push(cell);
 
-          selectedCellsRef.current.add(cell);
+          const newCell = {
+            cell: cell,
+            row: i,
+            col: numberToLetter[j - 1],
+          };
+          setSelectedCell((prev) => [...prev, newCell]);
         }
       }
     }
@@ -124,12 +144,20 @@ export default function PreviewTable({
       const td = e.target.closest("td");
       if (td) {
         setIsDragging(true);
-        startCellRef.current = td;
         clearSelection();
 
-        // SELECIONA A CLICADA
+        const [col, row] = td.id.match(/\d+/g) || [];
+
+        startCellRef.current = td;
         td.classList.add(...selectedRowColor);
-        selectedCellsRef.current.add(td);
+        const newCell = {
+          cell: td,
+          row: Number(row) + 2,
+          col: numberToLetter[Number(col)],
+        };
+
+        setSelectedCell((prev) => [...prev, newCell]);
+        selectedCellsRefs.current.push(td);
       }
     }
   };
@@ -211,6 +239,7 @@ export default function PreviewTable({
                           {/* ROWS NUMBERS */}
                           {j === 0 && (
                             <TableCell
+                              id={`collumn${j}-row${i}`}
                               className="bg-zinc-800 p-0 text-center"
                               key={`tableCell-first-${j}-row-${i}`}
                             >
@@ -219,7 +248,10 @@ export default function PreviewTable({
                           )}
 
                           {/* ROWS ITEMS */}
-                          <TableCell key={`tableCell-${j}-row-${i}`}>
+                          <TableCell
+                            id={`collumn${j}-row${i}`}
+                            key={`tableCell-${j}-row-${i}`}
+                          >
                             {cell}
                           </TableCell>
                         </>
