@@ -49,6 +49,7 @@ export const ChatContent = ({
   const [isLoadingPrewiew, setIsLoadingPreview] = useState(false);
 
   const [workbook, setWorkbook] = useState<ExcelJS.Workbook | null>(null);
+  const [workbookTotalSheets, setWorkbookTotalSheets] = useState<number>(0);
   const [workbookSheets, setWorkbookSheets] = useState<string[] | null>(null);
   const [previewTable, setPreviewTable] = useState<string[][] | null>(null);
 
@@ -86,12 +87,25 @@ export const ChatContent = ({
       await workbook.xlsx.load(buffer);
       setWorkbook(workbook);
 
-      workbook.eachSheet((worksheet, _sheetId) => {
+      setWorkbookTotalSheets(workbook.worksheets.length - 1);
+
+      // PRIMEIRO LER A PRIMEIRA PAGINA
+      const firstPage = workbook.worksheets[0];
+      setWorkbookSheets([firstPage.name]);
+
+      // DEPOIS LER AS OUTRAS DE FORMA ASYNC
+      setTimeout(async () => {
+        const remainingSheets = workbook.worksheets.slice(1);
+        const sheetNames = remainingSheets.map((worksheet) => worksheet.name);
+
         setWorkbookSheets((prev) =>
-          prev ? [...prev, worksheet.name] : [worksheet.name]
+          prev ? [...prev, ...sheetNames] : [...sheetNames]
         );
-      });
+      }, 0);
+
+      setTimeout(async () => setWorkbookTotalSheets(0), 0);
     };
+
     reader.readAsArrayBuffer(file);
   }, [file]);
 
@@ -261,17 +275,59 @@ export const ChatContent = ({
                     {sheetNum} - ({i + 1})
                   </ButtonSd>
                 ))}
+
+              {/*  LOADERS */}
+              {workbookTotalSheets > 0 &&
+                Array.from(
+                  { length: workbookTotalSheets },
+                  (_, index) => index
+                ).map((_, i) => (
+                  <ButtonSd
+                    key={`sheet-loader-${i}`}
+                    onClick={() => {
+                      renderWorksheet(i);
+                      setSelectedSheet(i);
+                    }}
+                    variant="link"
+                    className="w-full justify-start"
+                  >
+                    Lendo página
+                    <svg
+                      className="size-5 animate-spin text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                  </ButtonSd>
+                ))}
             </div>
 
             <Button
               color="primary"
               variant="flat"
               size="lg"
-              className={classNames("w-[200px] bg-blue-600 ease-in-out mx-auto mt-10 ", {
-                "opacity-0 -translate-y-2 ": !file,
-                "opacity-1 translate-y-5 ": file,
-                "animate-pulse": isFileUploading,
-              })}
+              className={classNames(
+                "w-[200px] bg-blue-600 ease-in-out mx-auto mt-10 ",
+                {
+                  "opacity-0 -translate-y-2 ": !file,
+                  "opacity-1 translate-y-5 ": file,
+                  "animate-pulse": isFileUploading,
+                }
+              )}
               onClick={() => null}
               disabled={isFileUploading}
             >
