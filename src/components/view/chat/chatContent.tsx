@@ -17,6 +17,7 @@ import { DefaultDropzone } from "../../ui/Dropzone";
 import PreviewTable from "./previewTable";
 import { Message } from "./Message";
 import { Button as ButtonSd } from "@/components/ui/button";
+import { SheetRangeInput } from "@/components/ui/inputs/rangeInput";
 
 import { ChatMessage } from "./type";
 
@@ -240,7 +241,7 @@ export const ChatContent = ({
 
             {/* RANGE INPUTS */}
             <div className="flex flex-row gap-2 justify-center items-center">
-              <Input
+              <SheetRangeInput
                 label="Inicio"
                 size="sm"
                 labelPlacement="inside"
@@ -248,7 +249,7 @@ export const ChatContent = ({
                 disabled={previewTable?.[0] == null}
               />
               :
-              <Input
+              <SheetRangeInput
                 label="Fim"
                 size="sm"
                 labelPlacement="inside"
