@@ -13,13 +13,28 @@ O **GRAPHFY** é uma aplicação web inteligente que permite a leitura e anális
 
 ---
 
-### Escopo
-A aplicação web permitirá:
+### Requisitos Funcionais
 
-- Upload e leitura de planilhas
-- Geração de gráficos com auxílio da IA
-- Autenticação de usuários
+- Upload de Planilhas: O sistema deve permitir que o usuário envie arquivos no formato .xlsx ou .csv através da interface web.
 
+- Leitura de Dados: Após o upload, o sistema deve processar e exibir os dados contidos na planilha em formato tabular.
+
+- Geração de Gráficos com IA: O sistema deve interpretar os dados da planilha e gerar visualizações gráficas com auxílio de IA para sugerir os tipos de gráfico mais relevantes (ex: pizza, barras, linha).
+
+- Autenticação de Usuários: O sistema deve permitir que usuários se registrem, façam login e acessem suas planilhas e gráficos de forma segura.
+
+- Histórico de Arquivos e Gráficos: O sistema deve armazenar os uploads e gráficos gerados por cada usuário autenticado, permitindo consulta posterior.
+
+### Requisitos Não Funcionais
+- Segurança: A aplicação deve proteger os dados dos usuários com autenticação JWT e comunicação via HTTPS.
+
+- Performance: A leitura da planilha deve ser feita de forma assíncrona — para otimização dos recursos do computador do usuário.
+
+- Escalabilidade: A aplicação deve ser capaz de escalar horizontalmente para atender a múltiplos usuários simultâneos.
+
+- Compatibilidade: A interface deve funcionar corretamente nos navegadores modernos (Chrome, Edge, Safari).
+
+- Usabilidade: A aplicação deve ter uma interface intuitiva, com feedback visual claro para ações como upload, geração de gráficos e autenticação.
 ---
 
 ### Arquitetura
