@@ -11,38 +11,61 @@ import { acceptPlanilhas } from "@/lib/defaultConstants";
 interface DefaultDropzoneProps {
   setFile: Dispatch<SetStateAction<File | null>>;
   file: File | null;
+  disabled: boolean;
 }
 export const DefaultDropzone = React.forwardRef<
   HTMLDivElement,
   DefaultDropzoneProps
->(({ setFile, file }, ref) => {
+>(({ setFile, file, disabled = false }, ref) => {
   const onDrop = useCallback((acceptedFiles: any[]) => {
+    if (disabled) return;
+
     setFile(acceptedFiles[0]);
   }, []);
 
   const { fileRejections, getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: acceptPlanilhas,
+    disabled,
   });
 
   return (
     <div
       ref={ref}
       className={classNames(
-        "relative p-4 flex justify-center items-center rounded-lg w-[550px] h-[160px] border border-blue-400  hover:bg-blue-400/[0.05]  text-white text-sm  select-none group",
-        {}
+        "relative p-4 flex justify-center items-center rounded-lg w-[550px] h-[160px] border border-blue-400  hover:bg-blue-400/[0.05] text-white text-sm  select-none group ",
+        { "bg-black/30 hover:bg-black/30 cursor-default": disabled }
       )}
     >
       {file == null ? (
         <>
           <div
             {...getRootProps()}
-            className="absolute inset-0 w-full flex justify-center items-center cursor-pointer"
+            className={classNames(
+              "absolute inset-0 w-full flex justify-center items-center ",
+              {
+                "cursor-default": disabled,
+                "cursor-pointer": !disabled,
+              }
+            )}
           >
-            <div className="flex flex-col justify-center items-center gap-4 cursor-pointer">
+            <div
+              className={classNames(
+                "flex flex-col justify-center items-center gap-4 ",
+                {
+                  "cursor-default": disabled,
+                  "cursor-pointer": !disabled,
+                }
+              )}
+            >
               <FileUp
                 size={32}
-                className="group-hover:-translate-y-1 transition-transform duration-200 ease-in-out"
+                className={classNames(
+                  "transition-transform duration-200 ease-in-out",
+                  {
+                    "group-hover:-translate-y-1 ": !disabled,
+                  }
+                )}
               />
               <input {...getInputProps()} />
               <p className="text-center text-md">

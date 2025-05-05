@@ -47,6 +47,7 @@ export const ChatContent = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
 
+  const [isRender, setIsRender] = useState(false);
   const [isLoadingPrewiew, setIsLoadingPreview] = useState(false);
 
   const [workbook, setWorkbook] = useState<ExcelJS.Workbook | null>(null);
@@ -60,6 +61,8 @@ export const ChatContent = ({
     if (dropzoneRef?.current != null) {
       dropzoneRef.current.focus();
     }
+
+    setIsRender(true);
   }, []);
 
   useEffect(() => {
@@ -180,7 +183,12 @@ export const ChatContent = ({
           </p>
 
           <div className="w-full flex flex-col justify-center items-center gap-5 mt-5">
-            <DefaultDropzone ref={dropzoneRef} setFile={setFile} file={file} />
+            <DefaultDropzone
+              ref={dropzoneRef}
+              setFile={setFile}
+              file={file}
+              disabled={true}
+            />
 
             {file && (
               <Button

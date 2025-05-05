@@ -31,7 +31,7 @@ export const ChatContainer = ({
   const [input, setInput] = useState<string>("");
 
   const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
-  const { messages, setMessages, setErrorMessage } = useMessages();
+  const {messages, setMessages, setErrorMessage } = useMessages();
   const [messageStatus, setMessageStatus] = useState<string>("");
 
   const [file, setFile] = useState<File | null>(null);
