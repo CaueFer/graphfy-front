@@ -55,6 +55,13 @@ export const ChatContent = ({
   const [workbookSheets, setWorkbookSheets] = useState<string[] | null>(null);
   const [previewTable, setPreviewTable] = useState<string[][] | null>(null);
 
+  const [selectedRange, setSelectedRange] = useState<{
+    initialRow?: number;
+    initialCol?: number;
+    finalRow?: number;
+    finalCol?: number;
+  } | null>(null);
+
   const [selectedSheet, setSelectedSheet] = useState<number>(0);
 
   useEffect(() => {
@@ -122,9 +129,14 @@ export const ChatContent = ({
 
     worksheet.eachRow((row) => {
       if (Array.isArray(row.values)) {
-        const stringifyArray: string[] = row.values.map((cell) => String(cell));
+        const notEmptyArray = Array.from(row.values); // transforme os itens EMPTY em undefined para o map reconhecer
+        const stringifyArray: string[] = notEmptyArray.map((cell) =>
+          cell == null ? "" : String(cell)
+        );
 
         rows.push(stringifyArray.slice(1)); // remove o índice 0 q eh undefined por padrao
+
+        console.log(stringifyArray);
       }
     });
 
@@ -133,6 +145,36 @@ export const ChatContent = ({
 
     // DADOS PARA O COMPONENT DA TABELA
     setPreviewTable(rows);
+  };
+
+  const getWorksheetRange = () => {
+    if (
+      previewTable &&
+      selectedRange &&
+      selectedRange.initialRow != null &&
+      selectedRange.initialCol != null &&
+      selectedRange.finalRow != null &&
+      selectedRange.finalCol != null
+    ) {
+      const rangeCells: string[] = [];
+
+      for (
+        let row = selectedRange.initialRow;
+        row <= selectedRange.finalRow;
+        row++
+      ) {
+        for (
+          let col = selectedRange.initialCol;
+          col <= selectedRange.finalCol;
+          col++
+        ) {
+          const cell = previewTable[row - 1][col];
+          rangeCells.push(cell);
+        }
+      }
+
+      console.log(rangeCells);
+    }
   };
 
   return (
@@ -255,6 +297,12 @@ export const ChatContent = ({
                 labelPlacement="inside"
                 placeholder="A:1"
                 disabled={previewTable?.[0] == null}
+                selectedRange={{
+                  col: selectedRange?.initialCol,
+                  row: selectedRange?.initialRow,
+                }}
+                setSelectedRange={setSelectedRange}
+                isInitial={true}
               />
               :
               <SheetRangeInput
@@ -263,6 +311,12 @@ export const ChatContent = ({
                 labelPlacement="inside"
                 placeholder="Z:50"
                 disabled={previewTable?.[0] == null}
+                selectedRange={{
+                  col: selectedRange?.finalCol,
+                  row: selectedRange?.finalRow,
+                }}
+                setSelectedRange={setSelectedRange}
+                isInitial={false}
               />
             </div>
 
@@ -339,7 +393,7 @@ export const ChatContent = ({
                   "animate-pulse": isFileUploading,
                 }
               )}
-              onClick={() => null}
+              onClick={() => getWorksheetRange()}
               disabled={isFileUploading}
             >
               {!isFileUploading ? (
@@ -377,6 +431,7 @@ export const ChatContent = ({
           <PreviewTable
             fileName={file?.name as string}
             previewTable={previewTable}
+            setSelectedRange={setSelectedRange}
           />
         </div>
       )}

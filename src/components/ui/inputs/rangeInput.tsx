@@ -1,6 +1,7 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 
 import { Input } from "@nextui-org/react";
+import { letterToNumber, numberToLetter } from "@/lib/defaultConstants";
 
 interface SheetRangeInputProps {
   size: "sm" | "md" | "lg";
@@ -8,6 +9,19 @@ interface SheetRangeInputProps {
   labelPlacement?: "inside" | "outside-left" | "outside";
   placeholder?: string;
   disabled: boolean;
+  selectedRange: {
+    row?: number;
+    col?: number;
+  } | null;
+  setSelectedRange: Dispatch<
+    SetStateAction<{
+      initialRow?: number;
+      initialCol?: number;
+      finalRow?: number;
+      finalCol?: number;
+    } | null>
+  >;
+  isInitial: boolean;
 }
 export function SheetRangeInput({
   label,
@@ -15,22 +29,46 @@ export function SheetRangeInput({
   disabled = false,
   labelPlacement = "inside",
   placeholder,
+  selectedRange,
+  setSelectedRange,
+  isInitial = false,
 }: SheetRangeInputProps) {
-  const [value, setValue] = useState("");
-
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.toUpperCase();
     const cleanedValue = rawValue.replace(/[^A-Z0-9:]/g, "");
 
     // EMPTY
     if (cleanedValue.length === 0) {
-      setValue("");
-      return;
+      if (isInitial) {
+        setSelectedRange((prev) => ({
+          initialCol: undefined,
+          initialRow: undefined,
+          ...prev,
+        }));
+      } else {
+        setSelectedRange((prev) => ({
+          finalCol: undefined,
+          finalRow: undefined,
+          ...prev,
+        }));
+      }
     }
 
-    //
+    // ONLY COL
     if (cleanedValue.length === 1 && /^[A-Z]$/.test(cleanedValue)) {
-      setValue(cleanedValue);
+      const col = cleanedValue;
+
+      if (isInitial) {
+        setSelectedRange((prev) => ({
+          initialCol: letterToNumber[col],
+          ...prev,
+        }));
+      } else {
+        setSelectedRange((prev) => ({
+          initialCol: letterToNumber[col],
+          ...prev,
+        }));
+      }
       return;
     }
 
@@ -39,11 +77,31 @@ export function SheetRangeInput({
       const letter = match[1];
       const hasColon = match[2] === ":";
       const numbers = match[3] || "";
-      setValue(hasColon || numbers ? `${letter}:${numbers}` : letter);
+
+      if (isInitial) {
+        setSelectedRange((prev) => ({
+          initialCol: letterToNumber[letter],
+          initialRow: Number(numbers),
+          ...prev,
+        }));
+      } else {
+        setSelectedRange((prev) => ({
+          initialCol: letterToNumber[letter],
+          initialRow: Number(numbers),
+          ...prev,
+        }));
+      }
+
       return;
     }
 
-    setValue(rawValue.slice(0, -1));
+    // setValue(rawValue.slice(0, -1));
+  };
+
+  const getInputData = (col: number | undefined, row: number | undefined) => {
+    if (col == null || row == null) return "";
+
+    return `${numberToLetter[col]}:${selectedRange?.row}`;
   };
 
   return (
@@ -54,7 +112,7 @@ export function SheetRangeInput({
       placeholder={placeholder}
       disabled={disabled}
       onChange={(e) => onChange(e)}
-      value={value}
+      value={getInputData(selectedRange?.col, selectedRange?.row)}
     />
   );
 }

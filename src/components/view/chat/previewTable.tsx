@@ -1,6 +1,13 @@
 "use client";
 
-import { MouseEvent, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  MouseEvent,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   Table,
@@ -17,10 +24,19 @@ const selectedRowColor = ["bg-muted/50", "hover:bg-muted/50"];
 interface PreviewTableProps {
   fileName: string;
   previewTable: string[][] | null;
+  setSelectedRange: Dispatch<
+    SetStateAction<{
+      initialRow?: number;
+      initialCol?: number;
+      finalRow?: number;
+      finalCol?: number;
+    } | null>
+  >;
 }
 export default function PreviewTable({
   fileName,
   previewTable,
+  setSelectedRange,
 }: PreviewTableProps) {
   const tableBodyScroll = useRef<HTMLTableElement>(null);
   const [activeRows, setActiveRows] = useState(previewTable?.slice(0, 15));
@@ -67,8 +83,12 @@ export default function PreviewTable({
       const finalRow = selectedCells[selectedCells.length - 1].row;
       const finalCol = selectedCells[selectedCells.length - 1].col;
 
-      console.log("Inicio", initialCol + ":" + initialRow);
-      console.log("Inicio", finalCol + ":" + finalRow);
+      setSelectedRange({
+        initialRow,
+        initialCol,
+        finalRow,
+        finalCol,
+      });
     }
   }, [selectedCells]);
 
@@ -131,7 +151,7 @@ export default function PreviewTable({
           const newCell = {
             cell: cell,
             row: i,
-            col: numberToLetter[j - 1],
+            col: j - 1,
           };
           setSelectedCell((prev) => [...prev, newCell]);
         }
@@ -153,7 +173,7 @@ export default function PreviewTable({
         const newCell = {
           cell: td,
           row: Number(row) + 2,
-          col: numberToLetter[Number(col)],
+          col: Number(col),
         };
 
         setSelectedCell((prev) => [...prev, newCell]);
@@ -230,6 +250,7 @@ export default function PreviewTable({
                   ))}
                 </TableRow>
               </TableHeader>
+              
               <TableBody className="relative overflow-scroll">
                 {activeRows != null &&
                   activeRows.slice(1).map((row, i) => (
