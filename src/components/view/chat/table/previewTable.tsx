@@ -33,7 +33,7 @@ interface PreviewTableProps {
     } | null>
   >;
 }
-export default function PreviewTable({
+export function PreviewTable({
   fileName,
   previewTable,
   setSelectedRange,
@@ -224,7 +224,7 @@ export default function PreviewTable({
                   {previewTable[0].map((_cell, i) => (
                     <>
                       {i == 0 && (
-                        <TableHead key={`head-0`} className="p-0"></TableHead>
+                        <TableHead key={`head-0`} className="p-0" />
                       )}
                       <TableHead key={`head-${numberToLetter[i]}`}>
                         {numberToLetter[i]}
@@ -250,7 +250,7 @@ export default function PreviewTable({
                   ))}
                 </TableRow>
               </TableHeader>
-              
+
               <TableBody className="relative overflow-scroll">
                 {activeRows != null &&
                   activeRows.slice(1).map((row, i) => (
