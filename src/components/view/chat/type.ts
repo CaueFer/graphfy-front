@@ -11,3 +11,7 @@ export interface ChatMessage extends Omit<Message, "role"> {
     | "error"
     | "loading";
 }
+
+export interface IReadSelectedCellsProps {
+  classList: "add" | "remove";
+}

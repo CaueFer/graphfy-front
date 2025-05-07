@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { TableProperties } from "lucide-react";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
@@ -9,6 +9,9 @@ import { SheetRangeInput } from "@/components/ui/inputs/rangeInput";
 import { Button as ButtonSd } from "@/components/ui/button";
 import SpinnerSvg from "@/components/svgs/spinner";
 import { PreviewTable } from "./previewTable";
+import { selectedCellColor } from "@/lib/defaultConstants";
+
+import { IReadSelectedCellsProps } from "../type";
 
 interface PreviewContaineProps {
   previewTable: string[][];
@@ -36,6 +39,37 @@ export function PreviewContainer({
     finalRow?: number;
     finalCol?: number;
   } | null>(null);
+
+  useEffect(() => {
+    readSelectedCells({ classList: "add" });
+  }, [selectedRange]);
+
+  const readSelectedCells = ({ classList }: IReadSelectedCellsProps) => {
+    if (
+      selectedRange?.initialRow != null &&
+      selectedRange?.initialCol != null
+    ) {
+      const startRow = selectedRange?.initialRow ?? 0;
+      const endRow =
+        selectedRange?.finalRow != null ? selectedRange?.finalRow : startRow;
+
+      const startCol = selectedRange?.initialCol ?? 0;
+      const endCol = selectedRange?.finalCol
+        ? selectedRange?.finalCol
+        : startCol;
+
+      // PASSA POR TODO O SELECTED RANGE E FAZ ALGO
+      for (let i = startRow; i <= endRow; i++) {
+        for (let j = startCol; j <= endCol; j++) {
+          const cell = document.getElementById(`col${j}-row${i}`);
+
+          if (classList === "add") cell?.classList.add(...selectedCellColor);
+          else cell?.classList.remove(...selectedCellColor);
+        }
+      }
+    }
+  };
+
   const getWorksheetRange = () => {
     if (
       previewTable &&
@@ -143,26 +177,7 @@ export function PreviewContainer({
                 className="w-full justify-start"
               >
                 Lendo página
-                <svg
-                  className="size-5 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
+                <SpinnerSvg />
               </ButtonSd>
             ))}
         </div>
@@ -199,6 +214,8 @@ export function PreviewContainer({
         fileName={file?.name as string}
         previewTable={previewTable}
         setSelectedRange={setSelectedRange}
+        selectedRange={selectedRange}
+        readSelectedCells={readSelectedCells}
       />
     </div>
   );

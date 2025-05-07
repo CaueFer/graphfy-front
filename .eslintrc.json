@@ -1,6 +1,11 @@
 {
-  "extends": ["next/core-web-vitals", "plugin:prettier/recommended"],
-  "plugins": ["prettier"],
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["prettier", "@typescript-eslint"],
   "rules": {
     "prettier/prettier": ["error", { "printWidth": 80 }],
     "max-len": [
@@ -8,6 +13,13 @@
       {
         "code": 80,
         "ignoreComments": true
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "JSXOpeningElement[name.name='svg']",
+        "message": "Evite usar <svg> diretamente."
       }
     ]
   }

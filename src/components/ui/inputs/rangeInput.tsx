@@ -39,69 +39,52 @@ export function SheetRangeInput({
 
     // EMPTY
     if (cleanedValue.length === 0) {
-      if (isInitial) {
-        setSelectedRange((prev) => ({
-          initialCol: undefined,
-          initialRow: undefined,
-          ...prev,
-        }));
-      } else {
-        setSelectedRange((prev) => ({
-          finalCol: undefined,
-          finalRow: undefined,
-          ...prev,
-        }));
-      }
+      setSelectedRange((prev) => ({
+        ...prev,
+        ...(isInitial
+          ? { initialCol: undefined, initialRow: undefined }
+          : { finalCol: undefined, finalRow: undefined }),
+      }));
     }
 
-    // ONLY COL
-    if (cleanedValue.length === 1 && /^[A-Z]$/.test(cleanedValue)) {
+    // ONLY COLLUMN
+    if (cleanedValue.length === 1 && /^[a-z]$/gi.test(cleanedValue)) {
       const col = cleanedValue;
 
-      if (isInitial) {
-        setSelectedRange((prev) => ({
-          initialCol: letterToNumber[col],
-          ...prev,
-        }));
-      } else {
-        setSelectedRange((prev) => ({
-          initialCol: letterToNumber[col],
-          ...prev,
-        }));
-      }
+      setSelectedRange((prev) => ({
+        ...prev,
+        ...(isInitial
+          ? { initialCol: letterToNumber[col] }
+          : {
+              finalCol: letterToNumber[col],
+            }),
+      }));
+
       return;
     }
 
     const match = cleanedValue.match(/^([A-Z])(:)?([0-9]*)$/);
     if (match) {
       const letter = match[1];
-      const hasColon = match[2] === ":";
       const numbers = match[3] || "";
+      const col = letter ? letterToNumber[letter] : undefined;
+      const row = numbers ? Number(numbers) : undefined;
 
-      if (isInitial) {
-        setSelectedRange((prev) => ({
-          initialCol: letterToNumber[letter],
-          initialRow: Number(numbers),
-          ...prev,
-        }));
-      } else {
-        setSelectedRange((prev) => ({
-          initialCol: letterToNumber[letter],
-          initialRow: Number(numbers),
-          ...prev,
-        }));
-      }
+      setSelectedRange((prev) => ({
+        ...prev,
+        ...(isInitial
+          ? { initialCol: col, initialRow: row }
+          : { finalCol: col, finalRow: row }),
+      }));
 
       return;
     }
-
-    // setValue(rawValue.slice(0, -1));
   };
 
   const getInputData = (col: number | undefined, row: number | undefined) => {
-    if (col == null || row == null) return "";
+    if (col == null) return "";
 
-    return `${numberToLetter[col]}:${selectedRange?.row}`;
+    return `${col != null ? numberToLetter[col] : ""}${row != null ? ":" + selectedRange?.row : ""}`;
   };
 
   return (

@@ -9,6 +9,8 @@ export const acceptPlanilhas = {
 
 export const timeoutHeroTransition = 700;
 
+export const selectedCellColor = ["bg-muted/50", "hover:bg-muted/50"];
+
 export const numberToLetter: Record<number, string> = {
   0: "A",
   1: "B",

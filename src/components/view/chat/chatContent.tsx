@@ -13,7 +13,7 @@ import { Button } from "@nextui-org/react";
 import classNames from "classnames";
 import ExcelJS from "exceljs";
 
-import { PreviewContainer } from "./table/previewContainer";
+import { PreviewContainer } from "./preview/previewContainer";
 import SpinnerSvg from "@/components/svgs/spinner";
 import { DefaultDropzone } from "../../ui/Dropzone";
 import { Message } from "./Message";

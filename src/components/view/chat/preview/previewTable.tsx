@@ -2,6 +2,7 @@
 
 import {
   Dispatch,
+  Fragment,
   MouseEvent,
   SetStateAction,
   useEffect,
@@ -17,13 +18,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { numberToLetter } from "@/lib/defaultConstants";
 
-const selectedRowColor = ["bg-muted/50", "hover:bg-muted/50"];
+import { numberToLetter } from "@/lib/defaultConstants";
+import { IReadSelectedCellsProps } from "../type";
 
 interface PreviewTableProps {
   fileName: string;
   previewTable: string[][] | null;
+  selectedRange: {
+    initialRow?: number;
+    initialCol?: number;
+    finalRow?: number;
+    finalCol?: number;
+  } | null;
   setSelectedRange: Dispatch<
     SetStateAction<{
       initialRow?: number;
@@ -32,19 +39,19 @@ interface PreviewTableProps {
       finalCol?: number;
     } | null>
   >;
+  readSelectedCells: ({ classList }: IReadSelectedCellsProps) => void;
 }
 export function PreviewTable({
   fileName,
   previewTable,
+  selectedRange,
   setSelectedRange,
+  readSelectedCells,
 }: PreviewTableProps) {
   const tableBodyScroll = useRef<HTMLTableElement>(null);
   const [activeRows, setActiveRows] = useState(previewTable?.slice(0, 15));
 
   const [isDragging, setIsDragging] = useState(false);
-  const startCellRef = useRef<HTMLTableCellElement | null>(null);
-  const [selectedCells, setSelectedCell] = useState<Record<string, any>[]>([]);
-  const selectedCellsRefs = useRef<HTMLTableCellElement[]>([]);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -75,23 +82,6 @@ export function PreviewTable({
     return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
   }, []);
 
-  useEffect(() => {
-    if (selectedCells.length > 0) {
-      const initialRow = selectedCells[0].row;
-      const initialCol = selectedCells[0].col;
-
-      const finalRow = selectedCells[selectedCells.length - 1].row;
-      const finalCol = selectedCells[selectedCells.length - 1].col;
-
-      setSelectedRange({
-        initialRow,
-        initialCol,
-        finalRow,
-        finalCol,
-      });
-    }
-  }, [selectedCells]);
-
   const loadMoreRows = () => {
     setActiveRows((prev) => {
       if (!prev || !previewTable) return;
@@ -102,61 +92,28 @@ export function PreviewTable({
     });
   };
 
-  const clearSelection = () => {
-    selectedCellsRefs.current.forEach((cell) => {
-      cell.classList.remove(...selectedRowColor);
-    });
-
-    setSelectedCell([]);
-    selectedCellsRefs.current = [];
-  };
-
-  const selectCellsInRange = (
-    startCell: HTMLTableCellElement,
-    endCell: HTMLTableCellElement
-  ) => {
-    clearSelection();
-
+  const updateLastSeletedCell = (lastCell: HTMLTableCellElement) => {
     const table = tableBodyScroll.current;
     if (!table) return;
 
-    // PEGAS AS LINHAS DA TABELA
-    const rows = Array.from(table.querySelectorAll("tr"));
+    const [col, row] = lastCell.id
+      .split("-")
+      .map((vl) => Number(vl.replace(/[^0-9]/g, "")));
 
-    // CALCULA X E Y DA CELULA
-    const getCellPosition = (cell: HTMLTableCellElement) => {
-      const row = cell.parentElement as HTMLTableRowElement;
-      const rowIndex = rows.indexOf(row);
-      const cellIndex = Array.from(row.cells).indexOf(cell);
-      return { rowIndex, cellIndex };
-    };
+    const [initialRow, initialCol] = [
+      selectedRange?.initialRow ?? 0,
+      selectedRange?.initialCol ?? 0,
+    ];
 
-    const startPos = getCellPosition(startCell);
-    const endPos = getCellPosition(endCell);
+    const lastSelectedItem = row + col;
+    const firstSelectedItem = initialRow + initialCol;
 
-    const minRow = Math.min(startPos.rowIndex, endPos.rowIndex);
-    const maxRow = Math.max(startPos.rowIndex, endPos.rowIndex);
-    const minCol = Math.min(startPos.cellIndex, endPos.cellIndex);
-    const maxCol = Math.max(startPos.cellIndex, endPos.cellIndex);
-
-    for (let i = minRow; i <= maxRow; i++) {
-      const row = rows[i];
-      const cells = Array.from(row.cells);
-      for (let j = minCol; j <= maxCol; j++) {
-        const cell = cells[j];
-        if (cell) {
-          cell.classList.add(...selectedRowColor);
-          selectedCellsRefs.current.push(cell);
-
-          const newCell = {
-            cell: cell,
-            row: i,
-            col: j - 1,
-          };
-          setSelectedCell((prev) => [...prev, newCell]);
-        }
-      }
-    }
+    setSelectedRange((prev) => ({
+      ...prev,
+      ...(lastSelectedItem > firstSelectedItem
+        ? { finalRow: row, finalCol: col }
+        : { initialRow: row, initialCol: col }),
+    }));
   };
 
   const handleMouseDown = (e: MouseEvent) => {
@@ -164,20 +121,16 @@ export function PreviewTable({
       const td = e.target.closest("td");
       if (td) {
         setIsDragging(true);
-        clearSelection();
+        readSelectedCells({ classList: "remove" });
 
         const [col, row] = td.id.match(/\d+/g) || [];
 
-        startCellRef.current = td;
-        td.classList.add(...selectedRowColor);
-        const newCell = {
-          cell: td,
-          row: Number(row) + 2,
-          col: Number(col),
-        };
-
-        setSelectedCell((prev) => [...prev, newCell]);
-        selectedCellsRefs.current.push(td);
+        setSelectedRange({
+          initialCol: Number(col),
+          initialRow: Number(row),
+          finalCol: Number(col),
+          finalRow: Number(row),
+        });
       }
     }
   };
@@ -192,8 +145,8 @@ export function PreviewTable({
     timeoutRef.current = setTimeout(() => {
       if (e.target instanceof HTMLElement) {
         const td = e.target.closest("td");
-        if (td && startCellRef.current) {
-          selectCellsInRange(startCellRef.current, td);
+        if (td) {
+          updateLastSeletedCell(td);
         }
       }
     }, 0);
@@ -222,31 +175,31 @@ export function PreviewTable({
                 {/* COLUMNS LETTER */}
                 <TableRow className="bg-zinc-800 ">
                   {previewTable[0].map((_cell, i) => (
-                    <>
+                    <Fragment key={`fragment-col-letter${i}`}>
                       {i == 0 && (
-                        <TableHead key={`head-0`} className="p-0" />
+                        <TableHead key={`head-letter`} className="p-0" />
                       )}
-                      <TableHead key={`head-${numberToLetter[i]}`}>
+                      <TableHead key={`head-letter-${numberToLetter[i]}`}>
                         {numberToLetter[i]}
                       </TableHead>
-                    </>
+                    </Fragment>
                   ))}
                 </TableRow>
 
                 {/* COLUMNS LABELS */}
                 <TableRow>
                   {previewTable[0].map((cell, i) => (
-                    <>
+                    <Fragment key={`fragment-col-label${i}`}>
                       {i == 0 && (
                         <TableHead
-                          key={`head-first-${numberToLetter[i]}`}
+                          key={`head-first-label-${i}`}
                           className="bg-zinc-800 p-0 text-center"
                         >
                           1
                         </TableHead>
                       )}
-                      <TableHead key={`head-${i}`}>{cell}</TableHead>
-                    </>
+                      <TableHead key={`head-label-${i}`}>{cell}</TableHead>
+                    </Fragment>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -254,15 +207,15 @@ export function PreviewTable({
               <TableBody className="relative overflow-scroll">
                 {activeRows != null &&
                   activeRows.slice(1).map((row, i) => (
-                    <TableRow key={`tableRow-${i}`}>
+                    <TableRow key={`bodyRow-${i + 2}`}>
                       {row.map((cell, j) => (
-                        <>
+                        <Fragment key={`fragment-rows${i}-col${j}`}>
                           {/* ROWS NUMBERS */}
                           {j === 0 && (
                             <TableCell
-                              id={`collumn${j}-row${i}`}
+                              id={`colfirst-row${i + 2}`}
                               className="bg-zinc-800 p-0 text-center"
-                              key={`tableCell-first-${j}-row-${i}`}
+                              key={`row-number-${j}-row-${i + 2}`}
                             >
                               {i + 2}
                             </TableCell>
@@ -270,12 +223,12 @@ export function PreviewTable({
 
                           {/* ROWS ITEMS */}
                           <TableCell
-                            id={`collumn${j}-row${i}`}
-                            key={`tableCell-${j}-row-${i}`}
+                            id={`col${j}-row${i + 2}`}
+                            key={`tableCell-${j}-row-${i + 2}`}
                           >
                             {cell}
                           </TableCell>
-                        </>
+                        </Fragment>
                       ))}
                     </TableRow>
                   ))}
