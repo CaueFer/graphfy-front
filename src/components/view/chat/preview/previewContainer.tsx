@@ -1,17 +1,18 @@
 "use client";
 
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useCallback, useEffect, useState } from "react";
 import { TableProperties } from "lucide-react";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
 
 import { SheetRangeInput } from "@/components/ui/inputs/rangeInput";
 import { Button as ButtonSd } from "@/components/ui/button";
-import SpinnerSvg from "@/components/svgs/spinner";
+import SpinnerSvg from "@/components/svg/spinner";
 import { PreviewTable } from "./previewTable";
 import { selectedCellColor } from "@/lib/defaultConstants";
 
 import { IReadSelectedCellsProps } from "../type";
+import { post } from "@/lib/helpers/fetch.helper";
 
 interface PreviewContaineProps {
   previewTable: string[][];
@@ -40,35 +41,38 @@ export function PreviewContainer({
     finalCol?: number;
   } | null>(null);
 
-  useEffect(() => {
-    readSelectedCells({ classList: "add" });
-  }, [selectedRange]);
+  const readSelectedCells = useCallback(
+    ({ classList }: IReadSelectedCellsProps) => {
+      if (
+        selectedRange?.initialRow != null &&
+        selectedRange?.initialCol != null
+      ) {
+        const startRow = selectedRange?.initialRow ?? 0;
+        const endRow =
+          selectedRange?.finalRow != null ? selectedRange?.finalRow : startRow;
 
-  const readSelectedCells = ({ classList }: IReadSelectedCellsProps) => {
-    if (
-      selectedRange?.initialRow != null &&
-      selectedRange?.initialCol != null
-    ) {
-      const startRow = selectedRange?.initialRow ?? 0;
-      const endRow =
-        selectedRange?.finalRow != null ? selectedRange?.finalRow : startRow;
+        const startCol = selectedRange?.initialCol ?? 0;
+        const endCol = selectedRange?.finalCol
+          ? selectedRange?.finalCol
+          : startCol;
 
-      const startCol = selectedRange?.initialCol ?? 0;
-      const endCol = selectedRange?.finalCol
-        ? selectedRange?.finalCol
-        : startCol;
+        // PASSA POR TODO O SELECTED RANGE E FAZ ALGO
+        for (let i = startRow; i <= endRow; i++) {
+          for (let j = startCol; j <= endCol; j++) {
+            const cell = document.getElementById(`col${j}-row${i}`);
 
-      // PASSA POR TODO O SELECTED RANGE E FAZ ALGO
-      for (let i = startRow; i <= endRow; i++) {
-        for (let j = startCol; j <= endCol; j++) {
-          const cell = document.getElementById(`col${j}-row${i}`);
-
-          if (classList === "add") cell?.classList.add(...selectedCellColor);
-          else cell?.classList.remove(...selectedCellColor);
+            if (classList === "add") cell?.classList.add(...selectedCellColor);
+            else cell?.classList.remove(...selectedCellColor);
+          }
         }
       }
-    }
-  };
+    },
+    []
+  );
+
+  useEffect(() => {
+    readSelectedCells({ classList: "add" });
+  }, [readSelectedCells, selectedRange]);
 
   const getWorksheetRange = () => {
     if (
@@ -98,6 +102,12 @@ export function PreviewContainer({
 
       console.log(rangeCells);
     }
+  };
+
+  const sendWorksheetRangeToApi = (worksheetRange: string[]) => {
+    post("/upload-spreadsheet", {
+      worksheetRange,
+    });
   };
 
   return (

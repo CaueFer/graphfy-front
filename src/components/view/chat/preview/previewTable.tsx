@@ -5,6 +5,7 @@ import {
   Fragment,
   MouseEvent,
   SetStateAction,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -18,7 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { numberToLetter } from "@/lib/defaultConstants";
 import { IReadSelectedCellsProps } from "../type";
 
@@ -55,6 +55,16 @@ export function PreviewTable({
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const loadMoreRows = useCallback(() => {
+    if (!previewTable) return;
+    setActiveRows((prev) => {
+      if (!prev) return;
+      const currentLength = prev.length;
+      const nextRows = previewTable.slice(currentLength, currentLength + 15);
+      return [...prev, ...nextRows];
+    });
+  }, [previewTable]);
+
   useEffect(() => {
     const tableBody = tableBodyScroll.current;
     if (!tableBody) return;
@@ -69,7 +79,7 @@ export function PreviewTable({
 
     tableBody.addEventListener("scroll", handleScroll);
     return () => tableBody.removeEventListener("scroll", handleScroll);
-  }, [activeRows]);
+  }, [activeRows, loadMoreRows]);
 
   useEffect(() => {
     setActiveRows(previewTable?.slice(0, 15));
@@ -82,48 +92,51 @@ export function PreviewTable({
     return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
   }, []);
 
-  const loadMoreRows = () => {
-    setActiveRows((prev) => {
-      if (!prev || !previewTable) return;
-
-      const currentLength = prev.length;
-      const nextRows = previewTable.slice(currentLength, currentLength + 15);
-      return [...prev, ...nextRows];
-    });
-  };
-
   const updateLastSeletedCell = (lastCell: HTMLTableCellElement) => {
-    const table = tableBodyScroll.current;
-    if (!table) return;
+    if (isDragging) {
+      const table = tableBodyScroll.current;
+      if (!table) return;
 
-    const [col, row] = lastCell.id
-      .split("-")
-      .map((vl) => Number(vl.replace(/[^0-9]/g, "")));
+      const [cellCol, cellRow] = lastCell.id
+        .split("-")
+        .map((vl) => Number(vl.replace(/[^0-9]/g, "")));
 
-    const [initialRow, initialCol] = [
-      selectedRange?.initialRow ?? 0,
-      selectedRange?.initialCol ?? 0,
-    ];
+      const [initialRow, initialCol, finalRow, finalCol] = [
+        selectedRange?.initialRow ?? 0,
+        selectedRange?.initialCol ?? 0,
+        selectedRange?.finalRow ?? 0,
+        selectedRange?.finalCol ?? 0,
+      ];
 
-    const lastSelectedItem = row + col;
-    const firstSelectedItem = initialRow + initialCol;
+      const startRow = Math.min(initialRow, cellRow);
+      const startCol = Math.min(initialCol, cellCol);
 
-    setSelectedRange((prev) => ({
-      ...prev,
-      ...(lastSelectedItem > firstSelectedItem
-        ? { finalRow: row, finalCol: col }
-        : { initialRow: row, initialCol: col }),
-    }));
+      const endRow = Math.max(initialRow, Math.max(cellRow, finalRow));
+      const endCol = Math.max(initialCol, Math.max(cellCol, finalCol));
+
+      setSelectedRange((prev) => ({
+        ...prev,
+        initialRow: startRow,
+        initialCol: startCol,
+        finalRow: endRow,
+        finalCol: endCol,
+      }));
+    }
   };
 
   const handleMouseDown = (e: MouseEvent) => {
     if (e.target instanceof HTMLElement) {
-      const td = e.target.closest("td");
-      if (td) {
+      const cell = e.target.closest("td") || e.target.closest("th");
+      if (cell) {
+        if (cell.id.includes("first")) {
+          setIsDragging(false);
+          return;
+        }
+
         setIsDragging(true);
         readSelectedCells({ classList: "remove" });
 
-        const [col, row] = td.id.match(/\d+/g) || [];
+        const [col, row] = cell.id.match(/\d+/g) || [];
 
         setSelectedRange({
           initialCol: Number(col),
@@ -168,7 +181,7 @@ export function PreviewTable({
               ref={tableBodyScroll}
               onMouseDown={(e) => handleMouseDown(e)}
               onMouseMove={(e) => handleMouseMove(e)}
-              onMouseUp={() => handleMouseUp()}
+              onDragEnd={() => handleMouseUp()}
               className="select-none"
             >
               <TableHeader className="sticky top-0 bg-zinc-900 z-50">
@@ -193,12 +206,15 @@ export function PreviewTable({
                       {i == 0 && (
                         <TableHead
                           key={`head-first-label-${i}`}
+                          id={`col${i}-row${0}-first`}
                           className="bg-zinc-800 p-0 text-center"
                         >
                           1
                         </TableHead>
                       )}
-                      <TableHead key={`head-label-${i}`}>{cell}</TableHead>
+                      <TableHead key={`head-label-${i}`} id={`col${i}-row${1}`}>
+                        {cell}
+                      </TableHead>
                     </Fragment>
                   ))}
                 </TableRow>

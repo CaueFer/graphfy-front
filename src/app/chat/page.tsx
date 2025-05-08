@@ -5,24 +5,19 @@ import { v4 as uuidv4 } from "uuid";
 
 import { ChatContainer } from "@/components/view/chat/chatContainer";
 import { ChatMessage } from "@/components/view/chat/type";
-import useCookies from "@/lib/hooks/useCookies";
+import { getClientCookie } from "@/lib/hooks/getClientCookie";
 
-interface ChatPageProps {}
-
-const ChatPage = ({}: ChatPageProps) => {
+const ChatPage = () => {
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
 
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     try {
       getInitialMessages();
 
-      const getSessionId = async () => {
-        setSessionId(await useCookies("sessionId"));
-      };
-      
-      getSessionId();
+      const token = getClientCookie("token");
+      if (token) setToken(token);
     } catch (error) {
       console.error("Erro get sessionId:", error);
     }
@@ -57,8 +52,8 @@ const ChatPage = ({}: ChatPageProps) => {
 
   return (
     <ChatContainer
-      key={sessionId}
-      sessionId={sessionId}
+      key={token}
+      token={token}
       initialMessages={initialMessages}
     />
   );

@@ -14,7 +14,7 @@ import classNames from "classnames";
 import ExcelJS from "exceljs";
 
 import { PreviewContainer } from "./preview/previewContainer";
-import SpinnerSvg from "@/components/svgs/spinner";
+import SpinnerSvg from "@/components/svg/spinner";
 import { DefaultDropzone } from "../../ui/Dropzone";
 import { Message } from "./Message";
 import { ChatMessage } from "./type";
@@ -135,6 +135,8 @@ export const ChatContent = ({
     // DADOS PARA O COMPONENT DA TABELA
     setPreviewTable(rows);
   };
+
+  
 
   return (
     <div

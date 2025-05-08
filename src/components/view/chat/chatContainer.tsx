@@ -13,11 +13,11 @@ import { ChatContent } from "./chatContent";
 import { ChatMessage } from "./type";
 
 interface ChatContainerProps {
-  sessionId: string | null;
+  token: string | null;
   initialMessages: ChatMessage[];
 }
 export const ChatContainer = ({
-  sessionId,
+  token,
   initialMessages,
 }: ChatContainerProps) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
@@ -31,17 +31,15 @@ export const ChatContainer = ({
   const [input, setInput] = useState<string>("");
 
   const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
-  const {messages, setMessages, setErrorMessage } = useMessages();
+  const { messages, setMessages, setErrorMessage } = useMessages();
   const [messageStatus, setMessageStatus] = useState<string>("");
 
   const [file, setFile] = useState<File | null>(null);
 
-  const [error, setError] = useState<Error>();
-
   useEffect(() => {
     if (initialMessages.length > 0) setIsInicialLoading(false);
-    setMessages((prev) => initialMessages);
-  }, [initialMessages]);
+    setMessages(initialMessages);
+  }, [initialMessages, setMessages]);
 
   useEffect(() => {
     const message = messages.at(-1);
@@ -60,22 +58,6 @@ export const ChatContainer = ({
   }, [messages]);
 
   useEffect(() => {
-    if (error) {
-      setIsLoadingMessage(false);
-      setDisableChatInput(true);
-
-      setMessages((prev: ChatMessage[]) => [
-        ...prev,
-        {
-          content: "Limite diário atingido!",
-          role: "error",
-          id: uuidv4(),
-        },
-      ]);
-    } else setDisableChatInput(false);
-  }, [error]);
-
-  useEffect(() => {
     setDisableChatInput(false);
 
     const timer = setTimeout(() => setLeftBarOpen(true), 400);
@@ -89,7 +71,7 @@ export const ChatContainer = ({
       const formData = new FormData();
       formData.append("file", file);
       formData.append("range", "0, 20");
-      formData.append("sessionId", sessionId ?? "");
+      formData.append("sessionId", token ?? "");
 
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-spreadsheet`, {
         method: "POST",
@@ -113,6 +95,7 @@ export const ChatContainer = ({
     } else setIsFileUploading(false);
   };
 
+  // ATUALIZA FRONT
   const handleSendMessageInitial = () => {
     setMessages((prev: ChatMessage[]) => [
       ...prev,
@@ -126,6 +109,7 @@ export const ChatContainer = ({
     handleSendMessageFinal(input);
   };
 
+  // ATUALIZA BACK
   const handleSendMessageFinal = async (prompt: string) => {
     setIsLoadingMessage(true);
     try {
@@ -139,7 +123,7 @@ export const ChatContainer = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt, sessionId }),
+        body: JSON.stringify({ prompt, sessionId: token }),
       }).then((response) => {
         const reader = response.body?.getReader();
         const decoder = new TextDecoder("utf-8");
