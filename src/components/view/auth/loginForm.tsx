@@ -1,6 +1,9 @@
 import { ComponentPropsWithoutRef, useState } from "react";
 import { EyeClosed, Eye, Grape } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
+import SpinnerSvg from "@/components/svg/spinner";
 import GoogleSvg from "@/components/svg/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +13,6 @@ import { clientCookie } from "@/lib/hooks/getClientCookie";
 import { post } from "@/lib/helpers/fetch.helper";
 import { useToast } from "@/lib/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export function LoginForm({
   className,
@@ -24,7 +25,13 @@ export function LoginForm({
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const [logged, setLogged] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
+
   const handleLogin = (formData: FormData) => {
+    setLogged(false);
+    setisLoading(false);
+
     const email = formData.get("email");
     const password = formData.get("password");
 
@@ -41,6 +48,8 @@ export function LoginForm({
             variant: "default",
           });
 
+          setLogged(true);
+
           cookie.set("token", data.token);
           router.push("/chat");
         }
@@ -54,6 +63,11 @@ export function LoginForm({
       })
       .catch((err) => {
         console.error(err);
+
+        setLogged(false);
+      })
+      .finally(() => {
+        setisLoading(false);
       });
   };
 
@@ -90,6 +104,7 @@ export function LoginForm({
                 placeholder="Seu melhor email..."
                 required
                 className="autofill:bg-background"
+                disabled={logged}
               />
             </div>
 
@@ -104,6 +119,7 @@ export function LoginForm({
                   placeholder="Sua senha..."
                   minLength={6}
                   required
+                  disabled={logged}
                 />
                 <Button
                   type="button"
@@ -115,7 +131,13 @@ export function LoginForm({
               </div>
             </div>
             <Button type="submit" className="w-full">
-              Login
+              {isLoading ? (
+                <>
+                  <SpinnerSvg /> Carregando...
+                </>
+              ) : (
+                "Login"
+              )}
             </Button>
           </div>
           <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
