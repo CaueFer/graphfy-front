@@ -1,27 +1,20 @@
 "use client";
 
-import React, { lazy, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Navbar,
   NavbarBrand,
   NavbarMenuToggle,
   NavbarContent,
-  NavbarItem,
   Link,
-  Button,
-  Tooltip,
 } from "@nextui-org/react";
-import {
-  GalleryVerticalEnd,
-  PanelLeftClose,
-  PanelRightClose,
-  SlidersVertical,
-} from "lucide-react";
-import { Button as ButtonSd } from "@/components/ui/button";
+import { Grape, PanelLeftClose, PanelRightClose } from "lucide-react";
 
-const NavConfigModal = lazy(() => {
-  return import("./navConfigModal");
-});
+import { LeftBarContent } from "./leftBarContent";
+import { LeftBarBottom } from "./leftBarBottom";
+import { clientCookie } from "@/lib/hooks/getClientCookie";
+import { decodeJWT } from "@/lib/helpers/jwt.helper";
+import { User } from "@/lib/global.types";
 
 interface NavLeftBar {
   setSmallMenu: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,9 +22,22 @@ interface NavLeftBar {
 }
 export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [loginModal, setLoginModal] = useState(false);
 
-  const menuItems = ["Login", "Ajuda & Feedback"];
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const token = clientCookie().get("token");
+
+    const getToken = async (token: string) => {
+      const payload = await decodeJWT(token);
+
+      setUser(payload.user as User);
+    };
+
+    if (token) {
+      getToken(token);
+    }
+  }, []);
 
   return (
     <Navbar
@@ -51,18 +57,11 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
         />
       </NavbarContent>
 
-      {/* XS BREAK POINT */}
-      <NavbarContent className="sm:hidden pr-3" justify="center">
-        <NavbarBrand>
-          <Link href="/" className="font-bold text-inherit">
-            GRAPHFY
-          </Link>
-          <Link />
-        </NavbarBrand>
-      </NavbarContent>
-
       {/* SM BREAK POINT */}
-      <NavbarContent className="hidden sm:flex gap-4 h-10" justify="center">
+      <NavbarContent
+        className="hidden sm:flex gap-4 h-10 w-full flex-row justify-around"
+        justify="center"
+      >
         {smallMenu ? (
           <PanelRightClose
             className="cursor-pointer"
@@ -72,6 +71,7 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
           <>
             <NavbarBrand>
               <Link href="/" className="font-bold text-inherit">
+                <Grape className="mr-1" />
                 GRAPHFY
               </Link>
             </NavbarBrand>
@@ -86,69 +86,12 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
 
       {/* NAV CONTENT */}
       <NavbarContent className="w-full gap-4 h-10 text-white" justify="center">
-        <NavbarItem className="max-w-full flex flex-col text-center justify-center items-center truncate gap-4">
-          <Tooltip
-            content={
-              <p className="text-black text-md text-pretty">
-                Suas conversas. Faça
-                <ButtonSd
-                  variant="link"
-                  role="link"
-                  className="cursor-pointer px-1"
-                >
-                  LOGIN
-                </ButtonSd>
-                para ver histórico.
-              </p>
-            }
-            placement="right"
-          >
-            <GalleryVerticalEnd className="size-10 text-white" />
-          </Tooltip>
-          {!smallMenu && (
-            <>
-              <h3 className="font-semibold text-xl text-white ">
-                Suas conversas
-              </h3>
-              <p className="text-zinc-400 text-md text-pretty">
-                Faça
-                <ButtonSd
-                  variant="link"
-                  role="link"
-                  className="cursor-pointer px-1"
-                >
-                  LOGIN
-                </ButtonSd>
-                para ver histórico.
-              </p>
-            </>
-          )}
-        </NavbarItem>
+        <LeftBarContent user={user} smallMenu={smallMenu} />
       </NavbarContent>
 
-      {/* BOTTOM BUTTONS */}
+      {/* BOTTOM */}
       <NavbarContent justify="center" className="h-10 py-10 w-full">
-        {smallMenu ? (
-          <NavbarItem className="relative flex">
-            <SlidersVertical
-              className="cursor-pointer"
-              onClick={() => setLoginModal((prev) => !prev)}
-            />
-
-            {loginModal && <NavConfigModal />}
-          </NavbarItem>
-        ) : (
-          <>
-            <NavbarItem className="flex">
-              <Link href="#">Cadastrar</Link>
-            </NavbarItem>
-            <NavbarItem>
-              <Button as={Link} color="default" href="#" variant="flat">
-                Login
-              </Button>
-            </NavbarItem>
-          </>
-        )}
+        <LeftBarBottom user={user} smallMenu={smallMenu} />
       </NavbarContent>
     </Navbar>
   );

@@ -37,15 +37,24 @@ export const ChatContainer = ({
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (initialMessages.length > 0) setIsInicialLoading(false);
-    setMessages(initialMessages);
+    setDisableChatInput(false);
+
+    const timer = setTimeout(() => setLeftBarOpen(true), 400);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (initialMessages.length > 0) {
+      setIsInicialLoading(false);
+      setMessages(initialMessages);
+    }
   }, [initialMessages, setMessages]);
 
   useEffect(() => {
     const message = messages.at(-1);
 
     if (message != null) {
-      if (messages.at(-1)?.role !== "user") setIsLoadingMessage(false);
+      if (message?.role !== "user") setIsLoadingMessage(false);
 
       const content = message.content
         .replace(/\*\*(.*?)\*\*/g, "<h2>$1</h2>")
@@ -56,13 +65,6 @@ export const ChatContainer = ({
       setFormattedMessages((prev) => [...prev, formattedMessage]);
     }
   }, [messages]);
-
-  useEffect(() => {
-    setDisableChatInput(false);
-
-    const timer = setTimeout(() => setLeftBarOpen(true), 400);
-    return () => clearTimeout(timer);
-  }, []);
 
   const fileUpload = async () => {
     setIsFileUploading(true);

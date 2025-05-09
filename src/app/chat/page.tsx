@@ -20,11 +20,11 @@ const ChatPage = () => {
       const token = cookie.get("token");
       if (token) setToken(token);
     } catch (error) {
-      console.error("Erro get sessionId:", error);
+      console.error("Erro get token:", error);
     }
-  }, []);
+  }, [cookie]);
 
-  const getInitialMessages = async () => {
+  const getInitialMessages = () => {
     try {
       // buscar no backend se tem messagem
       // setInitialMessages((prev: Message[]) => [

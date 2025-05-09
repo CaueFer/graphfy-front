@@ -67,7 +67,7 @@ export function PreviewContainer({
         }
       }
     },
-    []
+    [selectedRange]
   );
 
   useEffect(() => {

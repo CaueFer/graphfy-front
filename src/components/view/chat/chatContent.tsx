@@ -35,11 +35,9 @@ export const ChatContent = ({
   messages,
   file,
   setFile,
-  fileUpload,
   messageStatus,
   isFileUploading,
   isLoadingMessage,
-  isInicialLoading = false,
   setSmallMenu,
 }: ChatContentProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,9 +68,37 @@ export const ChatContent = ({
     }
   }, [messages]);
 
+  const renderWorksheet = useCallback(
+    (worksheetNumber: number = 0) => {
+      if (workbook == null) return;
+      setIsLoadingPreview(true);
+
+      const worksheet = workbook.worksheets[worksheetNumber]; // pega a aba
+      const rows: string[][] = [];
+
+      worksheet.eachRow((row) => {
+        if (Array.isArray(row.values)) {
+          const notEmptyArray = Array.from(row.values); // transforme os itens EMPTY em undefined para o map reconhecer
+          const stringifyArray: string[] = notEmptyArray.map((cell) =>
+            cell == null ? "" : String(cell)
+          );
+
+          rows.push(stringifyArray.slice(1)); // remove o índice 0 q eh undefined por padrao
+        }
+      });
+
+      setIsLoadingPreview(false);
+      setSmallMenu(true);
+
+      // DADOS PARA O COMPONENT DA TABELA
+      setPreviewTable(rows);
+    },
+    [setSmallMenu, workbook]
+  );
+
   useEffect(() => {
     renderWorksheet();
-  }, [workbook]);
+  }, [renderWorksheet, workbook]);
 
   const handleLoadPreviewTable = useCallback(() => {
     if (!file) return;
@@ -110,33 +136,6 @@ export const ChatContent = ({
 
     reader.readAsArrayBuffer(file);
   }, [file]);
-
-  const renderWorksheet = (worksheetNumber: number = 0) => {
-    if (workbook == null) return;
-    setIsLoadingPreview(true);
-
-    const worksheet = workbook.worksheets[worksheetNumber]; // pega a aba
-    const rows: string[][] = [];
-
-    worksheet.eachRow((row) => {
-      if (Array.isArray(row.values)) {
-        const notEmptyArray = Array.from(row.values); // transforme os itens EMPTY em undefined para o map reconhecer
-        const stringifyArray: string[] = notEmptyArray.map((cell) =>
-          cell == null ? "" : String(cell)
-        );
-
-        rows.push(stringifyArray.slice(1)); // remove o índice 0 q eh undefined por padrao
-      }
-    });
-
-    setIsLoadingPreview(false);
-    setSmallMenu(true);
-
-    // DADOS PARA O COMPONENT DA TABELA
-    setPreviewTable(rows);
-  };
-
-  
 
   return (
     <div
