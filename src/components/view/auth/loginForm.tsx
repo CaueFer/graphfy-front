@@ -6,25 +6,55 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { clientCookie } from "@/lib/hooks/getClientCookie";
 import { post } from "@/lib/helpers/fetch.helper";
+import { useToast } from "@/lib/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({
   className,
   ...props
 }: ComponentPropsWithoutRef<"div">) {
+  const router = useRouter();
+
+  const cookie = clientCookie();
+  const { toast } = useToast();
+
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (formData: FormData) => {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    console.log(email, password);
     post("/auth/login", {
       email,
       password,
-    });
+    })
+      .then(async (res: Response) => {
+        const data = await res.json();
+
+        if (res.ok) {
+          toast({
+            description: data.message,
+            variant: "default",
+          });
+
+          cookie.set("token", data.token);
+          router.push("/chat");
+        }
+
+        if (res.status >= 400) {
+          toast({
+            description: data.detail,
+            variant: "destructive",
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   return (

@@ -7,31 +7,68 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { post } from "@/lib/helpers/fetch.helper";
+import { useToast } from "@/lib/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { clientCookie } from "@/lib/hooks/getClientCookie";
+import { useRouter } from "next/navigation";
+import SpinnerSvg from "@/components/svg/spinner";
 
 export function SignupForm({
   className,
   ...props
 }: ComponentPropsWithoutRef<"div">) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const cookie = clientCookie();
+
   const [showPassword, setShowPassword] = useState(false);
 
+  const [logged, setLogged] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
+
   const handleSignup = (formData: FormData) => {
+    setLogged(false);
+    setisLoading(true);
+
     const username = formData.get("username");
     const email = formData.get("email");
     const password = formData.get("password");
 
-    console.log(username, email, password);
     post("/auth/signup", {
       username,
       email,
       password,
     })
-      .then((res) => {
-        console.log(res);
+      .then(async (res: Response) => {
+        const data = await res.json();
+
+        if (res.ok) {
+          toast({
+            description: data.message,
+            variant: "default",
+          });
+
+          setLogged(true);
+
+          cookie.set("token", data.token);
+          router.push("/chat");
+        }
+
+        if (res.status >= 400) {
+          toast({
+            description: data.detail,
+            variant: "destructive",
+          });
+        }
       })
       .catch((err) => {
         console.error(err);
+
+        setLogged(false);
+      })
+      .finally(() => {
+        setisLoading(false);
       });
   };
 
@@ -57,7 +94,9 @@ export function SignupForm({
               </Link>
             </div>
           </div>
-          <div className="flex flex-col gap-6">
+
+          {/* INPUTS */}
+          <div className="flex flex-col gap-6 h-[300px]">
             {/* NOME */}
             <div className="grid gap-2">
               <Label htmlFor="username">Nome</Label>
@@ -68,6 +107,7 @@ export function SignupForm({
                 placeholder="Seu nome..."
                 required
                 className="autofill:bg-background"
+                disabled={logged}
               />
             </div>
 
@@ -81,6 +121,7 @@ export function SignupForm({
                 placeholder="Seu melhor email..."
                 required
                 className="autofill:bg-background"
+                disabled={logged}
               />
             </div>
 
@@ -93,6 +134,9 @@ export function SignupForm({
                   id="password"
                   name="password"
                   placeholder="Sua senha..."
+                  required
+                  minLength={6}
+                  disabled={logged}
                 />
                 <Button
                   type="button"
@@ -103,16 +147,23 @@ export function SignupForm({
                 </Button>
               </div>
             </div>
+            
             <Button type="submit" className="w-full">
-              Criar
+              {isLoading ? (
+                <>
+                  <SpinnerSvg /> Carregando...
+                </>
+              ) : (
+                "Criar"
+              )}
             </Button>
           </div>
+
           <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
             <span className="relative z-10 bg-background px-2 text-muted-foreground">
               OU
             </span>
           </div>
-
           {/* OAUTH */}
           <div className="flex flex-row">
             <Button variant="outline" type="button" className="w-full mx-5">

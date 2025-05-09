@@ -57,10 +57,10 @@ export default function NavTopBar() {
 
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
-          <Link href="#">Cadastrar</Link>
+          <Link href="/signup">Cadastrar</Link>
         </NavbarItem>
         <NavbarItem>
-          <Button color="default" href="#" variant="flat">
+          <Button color="default" href="/logn" variant="flat">
             Login
           </Button>
         </NavbarItem>

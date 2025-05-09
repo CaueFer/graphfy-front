@@ -1,8 +1,8 @@
-import { getClientCookie } from "../hooks/getClientCookie";
+import { clientCookie } from "../hooks/getClientCookie";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http:localhost:5000/api";
 
-const token = getClientCookie("token");
+const token = clientCookie().get("token");
 
 export function post(
   endpoint: string,
