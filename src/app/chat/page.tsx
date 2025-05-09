@@ -4,10 +4,11 @@ import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { ChatContainer } from "@/components/view/chat/chatContainer";
+import { clientCookie } from "@/lib/hooks/getClientCookie";
 import { ChatMessage } from "@/components/view/chat/type";
-import { getClientCookie } from "@/lib/hooks/getClientCookie";
 
 const ChatPage = () => {
+  const cookie = clientCookie();
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
 
   const [token, setToken] = useState<string | null>(null);
@@ -16,7 +17,7 @@ const ChatPage = () => {
     try {
       getInitialMessages();
 
-      const token = getClientCookie("token");
+      const token = cookie.get("token");
       if (token) setToken(token);
     } catch (error) {
       console.error("Erro get sessionId:", error);

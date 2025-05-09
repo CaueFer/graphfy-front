@@ -17,7 +17,7 @@
     "@nextui-org/theme": "^2.2.9",
     "@radix-ui/react-label": "^2.1.6",
     "@radix-ui/react-slot": "^1.2.0",
-    "@radix-ui/react-toast": "^1.2.11",
+    "@radix-ui/react-toast": "^1.2.13",
     "ai": "^3.3.20",
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",
