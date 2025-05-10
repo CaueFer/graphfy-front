@@ -1,3 +1,4 @@
+"use client";
 import { ComponentPropsWithoutRef, useState } from "react";
 import { EyeClosed, Eye, Grape } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -30,7 +31,7 @@ export function LoginForm({
 
   const handleLogin = (formData: FormData) => {
     setLogged(false);
-    setisLoading(false);
+    setisLoading(true);
 
     const email = formData.get("email");
     const password = formData.get("password");
@@ -52,11 +53,12 @@ export function LoginForm({
 
           cookie.set("token", data.token);
           router.push("/chat");
+          setisLoading(false);
         }
 
         if (res.status >= 400) {
           toast({
-            description: data.detail,
+            description: data.detail || data.error,
             variant: "destructive",
           });
         }
@@ -64,10 +66,8 @@ export function LoginForm({
       .catch((err) => {
         console.error(err);
 
-        setLogged(false);
-      })
-      .finally(() => {
         setisLoading(false);
+        setLogged(false);
       });
   };
 

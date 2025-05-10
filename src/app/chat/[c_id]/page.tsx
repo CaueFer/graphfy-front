@@ -21,7 +21,6 @@ export default async function ChatInterceptor({
       });
 
       const data = await res.json();
-
       if (!data.success) {
         redirect("/chat");
       }
