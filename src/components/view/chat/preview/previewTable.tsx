@@ -55,6 +55,17 @@ export function PreviewTable({
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    const handleGlobalMouseUp = () => setIsDragging(false);
+
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+    return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
+  }, []);
+
+  useEffect(() => {
+    setActiveRows(previewTable?.slice(0, 15));
+  }, [previewTable]);
+
   const loadMoreRows = useCallback(() => {
     if (!previewTable) return;
     setActiveRows((prev) => {
@@ -80,17 +91,6 @@ export function PreviewTable({
     tableBody.addEventListener("scroll", handleScroll);
     return () => tableBody.removeEventListener("scroll", handleScroll);
   }, [activeRows, loadMoreRows]);
-
-  useEffect(() => {
-    setActiveRows(previewTable?.slice(0, 15));
-  }, [previewTable]);
-
-  useEffect(() => {
-    const handleGlobalMouseUp = () => setIsDragging(false);
-
-    window.addEventListener("mouseup", handleGlobalMouseUp);
-    return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
-  }, []);
 
   const updateLastSeletedCell = (lastCell: HTMLTableCellElement) => {
     if (isDragging) {
