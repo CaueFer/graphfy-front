@@ -5,6 +5,8 @@ import { cookies } from "next/headers";
 
 import { ChatLayout } from "@/components/view/chat/chatLayout";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
 export default async function ChatInterceptor({
   params,
 }: {
@@ -15,9 +17,10 @@ export default async function ChatInterceptor({
 
   if (params?.c_id) {
     try {
-      const res = await fetch("/chat/get-chat", {
+      const res = await fetch(API_URL + "/chat/get-chat", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ chat_id: params?.c_id }),
