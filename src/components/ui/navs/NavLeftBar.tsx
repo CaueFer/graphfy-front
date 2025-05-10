@@ -45,7 +45,7 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
       onMenuOpenChange={setIsMenuOpen}
       classNames={{
         base: [
-          `relative w-full h-full items-start bg-gradient-to-tr from-zinc-950 to-zinc-900 transition-width duration-400 `,
+          `relative w-full h-full items-start bg-gradient-to-tr from-zinc-950 to-zinc-900 transition-all duration-400 `,
         ],
         wrapper: ["py-4 h-full flex flex-col justify-between items-center"],
       }}

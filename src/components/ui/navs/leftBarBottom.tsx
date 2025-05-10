@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import { User } from "@/lib/global.types";
 import { LeftBarBottomModel } from "./leftBarBottomModal";
+import { cn } from "@/lib/utils";
 
 const NavConfigModal = lazy(() => {
   return import("./navConfigModal");
@@ -65,17 +66,32 @@ export function LeftBarBottom({ user, smallMenu }: LeftBarBottomProps) {
       )}
 
       {/* USER OPTIONS */}
-      {!smallMenu && user && (
+      {user && (
         <div
-          className="flex flex-row justify-start items-center w-full h-[70px] hover:bg-muted/20 rounded-md gap-3 px-4 cursor-pointer"
+          className={cn(
+            "flex flex-row items-center w-full h-[70px] hover:bg-muted/20 rounded-md cursor-pointer",
+            {
+              "justify-center rounded-full h-[50px]": smallMenu,
+              "px-4 justify-start gap-3": !smallMenu,
+            }
+          )}
           onClick={() => setShowUserOptions((prev) => !prev)}
         >
-          <div className="rounded-full border border-muted-foreground p-2">
+          <div className="rounded-full border border-muted-foreground p-2 z-20">
             <UserIcon />
           </div>
-          <div className="flex flex-col items-start justify-center gap-1">
-            <span className="text-xs">Bem vindo</span>
-            <span className="font-semibold capitalize">{user.username}</span>
+          <div
+            className={cn(
+              "flex flex-col items-start justify-center gap-1 transition-all duration-300 z-10 overflow-clip w-full",
+              {
+                "hidden opacity-0": smallMenu,
+              }
+            )}
+          >
+            <span className="text-xs text-nowrap">Bem vindo</span>
+            <span className="font-semibold capitalize text-nowrap">
+              {user.username}
+            </span>
           </div>
         </div>
       )}
