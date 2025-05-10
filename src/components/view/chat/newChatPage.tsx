@@ -16,31 +16,18 @@ import ExcelJS from "exceljs";
 import { PreviewContainer } from "./preview/previewContainer";
 import SpinnerSvg from "@/components/svg/spinner";
 import { DefaultDropzone } from "../../ui/Dropzone";
-import { Message } from "./Message";
-import { ChatMessage } from "./type";
 
-interface ChatContentProps {
+interface NewChatPageProps {
   file: File | null;
-  messageStatus: string;
-  fileUpload: () => void;
-  messages: ChatMessage[];
-  isFileUploading: boolean;
-  isLoadingMessage: boolean;
-  isInicialLoading: boolean;
   setFile: Dispatch<SetStateAction<File | null>>;
   setSmallMenu: Dispatch<SetStateAction<boolean>>;
 }
 
-export const ChatContent = ({
-  messages,
+export const NewChatPage = ({
   file,
   setFile,
-  messageStatus,
-  isFileUploading,
-  isLoadingMessage,
   setSmallMenu,
-}: ChatContentProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+}: NewChatPageProps) => {
   const dropzoneRef = useRef<HTMLDivElement>(null);
 
   const [isRender, setIsRender] = useState(true);
@@ -60,13 +47,6 @@ export const ChatContent = ({
 
     setIsRender(false);
   }, []);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
-    }
-  }, [messages]);
 
   const renderWorksheet = useCallback(
     (worksheetNumber: number = 0) => {
@@ -138,45 +118,9 @@ export const ChatContent = ({
   }, [file]);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex max-h-[calc(100vh-3.5rem-7rem)] flex-1 flex-col overflow-y-auto scroll-smooth"
-    >
-      {/* Messages */}
-      {messages.length > 0 && (
-        <>
-          {messages.map((message) => (
-            <>
-              <Message
-                key={message.id}
-                content={message.content}
-                isUserMessage={message.role === "user"}
-                isErrorMessage={message.role === "error"}
-                isLoadingMessage={message.role === "loading"}
-              />
-            </>
-          ))}
-          {isLoadingMessage && (
-            <>
-              {messageStatus != "" && (
-                <div className="px-6 ">
-                  <div className="max-w-3xl mx-auto flex items-start">
-                    <h2 className=" statusTextGradient">{messageStatus}</h2>
-                  </div>
-                </div>
-              )}
-              <Message
-                key={`loading-${Date.now()}`}
-                content={"loading"}
-                isUserMessage={false}
-              />
-            </>
-          )}
-        </>
-      )}
-
+    <div className="flex max-h-[calc(100vh-3.5rem-7rem)] flex-1 flex-col overflow-y-auto scroll-smooth">
       {/* DROPZONE */}
-      {messages.length < 1 && previewTable == null && (
+      {previewTable == null && (
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
           <MessageSquare className="size-10 text-blue-500" />
           <h3 className="font-semibold text-2xl text-white">Tudo pronto!</h3>
@@ -219,13 +163,12 @@ export const ChatContent = ({
       )}
 
       {/* Table Preview */}
-      {messages.length < 1 && previewTable != null && (
+      {previewTable != null && (
         <PreviewContainer
-          file={file}
+          fileName={file?.name || "Erro ao carregar arquivo."}
           previewTable={previewTable}
           selectedSheet={selectedSheet}
           workbookSheets={workbookSheets}
-          isFileUploading={isFileUploading}
           renderWorksheet={renderWorksheet}
           setSelectedSheet={setSelectedSheet}
           workbookTotalSheets={workbookTotalSheets}

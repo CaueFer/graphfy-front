@@ -7,22 +7,18 @@ import classNames from "classnames";
 
 import { ChatInput } from "@/components/ui/ChatInput";
 import NavLeftBar from "@/components/ui/navs/NavLeftBar";
-import { useMessages } from "@/lib/hooks/useMessages";
-import { ChatContent } from "./chatContent";
+import { ChatMessages } from "./messages/chatMessages";
+import { NewChatPage } from "./newChatPage";
 
+import { useMessages } from "@/lib/hooks/useMessages";
 import { ChatMessage } from "./type";
 
-interface ChatContainerProps {
+interface ChatLayoutProps {
   token: string | null;
-  initialMessages: ChatMessage[];
+  chatId?: string;
 }
-export const ChatContainer = ({
-  token,
-  initialMessages,
-}: ChatContainerProps) => {
+export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
-  const [isInicialLoading, setIsInicialLoading] = useState(true);
-  const [isFileUploading, setIsFileUploading] = useState(false);
 
   const [leftBarOpen, setLeftBarOpen] = useState(false);
   const [smallMenu, setSmallMenu] = useState(false);
@@ -31,7 +27,7 @@ export const ChatContainer = ({
   const [input, setInput] = useState<string>("");
 
   const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
-  const { messages, setMessages, setErrorMessage } = useMessages();
+  const { messages, setMessages, addMessage } = useMessages();
   const [messageStatus, setMessageStatus] = useState<string>("");
 
   const [file, setFile] = useState<File | null>(null);
@@ -42,13 +38,6 @@ export const ChatContainer = ({
     const timer = setTimeout(() => setLeftBarOpen(true), 400);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    if (initialMessages.length > 0) {
-      setIsInicialLoading(false);
-      setMessages(initialMessages);
-    }
-  }, [initialMessages, setMessages]);
 
   useEffect(() => {
     const message = messages.at(-1);
@@ -66,37 +55,6 @@ export const ChatContainer = ({
     }
   }, [messages]);
 
-  const fileUpload = async () => {
-    setIsFileUploading(true);
-
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("range", "0, 20");
-      formData.append("sessionId", token ?? "");
-
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload-spreadsheet`, {
-        method: "POST",
-        body: formData,
-      })
-        .then(async (response) => {
-          const data = await response.json();
-
-          if (data.success === true) {
-            setMessages((prev: ChatMessage[]) => [
-              ...prev,
-              {
-                content: `${data.message} \n\n ⛳ Dica: ${data.instructions}`,
-                role: "assistant",
-                id: Math.random().toString(),
-              },
-            ]);
-          }
-        })
-        .finally(() => setIsFileUploading(false));
-    } else setIsFileUploading(false);
-  };
-
   // ATUALIZA FRONT
   const handleSendMessageInitial = () => {
     setMessages((prev: ChatMessage[]) => [
@@ -111,7 +69,7 @@ export const ChatContainer = ({
     handleSendMessageFinal(input);
   };
 
-  // ATUALIZA BACK
+  // Chama API
   const handleSendMessageFinal = async (prompt: string) => {
     setIsLoadingMessage(true);
     try {
@@ -145,7 +103,7 @@ export const ChatContainer = ({
               const data = JSON.parse(s);
 
               if (data?.status != null) setMessageStatus(data.status);
-              else if (data?.error != null) setErrorMessage(data.error);
+              else if (data?.error != null) addMessage(data.error, "error");
               //FAZER UM TOAST PARA O ERRO
 
               if (data?.success) {
@@ -169,7 +127,7 @@ export const ChatContainer = ({
     } catch (error) {
       console.error("Erro ao enviar a mensagem:", error);
 
-      setErrorMessage();
+      addMessage("Erro ao enviar mensagem!", "error");
     } finally {
       setIsLoadingMessage(false);
     }
@@ -193,17 +151,24 @@ export const ChatContainer = ({
 
       <div className="relative min-h-full flex-grow bg-zinc-900 flex divide-y divide-zinc-700 flex-col justify-between gap-2 ">
         <div className="flex-1 text-white bg-zinc-900 justify-between flex flex-col">
-          <ChatContent
-            isLoadingMessage={isLoadingMessage}
-            isInicialLoading={isInicialLoading}
-            isFileUploading={isFileUploading}
-            messageStatus={messageStatus}
-            messages={formattedMessages}
-            fileUpload={fileUpload}
-            setFile={setFile}
-            file={file}
-            setSmallMenu={setSmallMenu}
-          />
+          {!chatId && (
+            <NewChatPage
+              setFile={setFile}
+              file={file}
+              setSmallMenu={setSmallMenu}
+            />
+          )}
+
+          {chatId && (
+            <ChatMessages
+              isLoadingMessage={isLoadingMessage}
+              setIsLoadingMessage={setIsLoadingMessage}
+              messageStatus={messageStatus}
+              messages={formattedMessages}
+              setMessages={setMessages}
+              chatId={chatId}
+            />
+          )}
         </div>
 
         <ChatInput
