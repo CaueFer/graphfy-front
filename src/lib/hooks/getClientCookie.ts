@@ -13,5 +13,11 @@ export const clientCookie = () => {
     document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
   };
 
-  return { get, set };
+  const remove = (name: string): void => {
+    if (typeof document === "undefined") return;
+
+    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+  };
+
+  return { get, set, remove };
 };
