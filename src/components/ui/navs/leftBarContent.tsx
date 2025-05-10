@@ -54,11 +54,9 @@ export function LeftBarContent({ smallMenu, user }: LeftBarContentProps) {
         </>
       )}
       {!smallMenu && user && (
-        <span className="group flex px-4 py-2 rounded-md border border-muted hover:bg-muted/50 cursor-pointer shadow min-w-[170px]">
-          <div className="group-hover:scale-[1.05] transition-all duration-200 flex flex-row justify-center items-center">
-            <DiamondPlus className="w-4 h-4 mr-2" />
-            Nova conversa
-          </div>
+        <span className="group flex flex-row justify-center items-center px-4 py-2 rounded-md border border-muted hover:bg-muted/20 cursor-pointer shadow min-w-[170px]">
+          <DiamondPlus className="w-5 h-4 mr-2 group-hover:rotate-90 transition-transform duration-700 ease-in-out" />
+          Nova conversa
         </span>
       )}
     </NavbarItem>

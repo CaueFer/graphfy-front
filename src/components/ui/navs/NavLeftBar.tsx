@@ -31,7 +31,7 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
     const getToken = async (token: string) => {
       const payload = await decodeJWT(token);
 
-      setUser(payload.user as User);
+      if (payload) setUser(payload.user as User);
     };
 
     if (token) {
@@ -45,7 +45,7 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
       onMenuOpenChange={setIsMenuOpen}
       classNames={{
         base: [
-          `relative w-full h-full items-start bg-gradient-to-tr from-black to-[#171717] transition-width duration-400 `,
+          `relative w-full h-full items-start bg-gradient-to-tr from-zinc-950 to-zinc-900 transition-width duration-400 `,
         ],
         wrapper: ["py-4 h-full flex flex-col justify-between items-center"],
       }}
