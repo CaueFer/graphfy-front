@@ -2,6 +2,7 @@
 
 import { SetStateAction, useCallback, useEffect, useState } from "react";
 import { TableProperties } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
 
@@ -9,10 +10,11 @@ import { SheetRangeInput } from "@/components/ui/inputs/rangeInput";
 import { Button as ButtonSd } from "@/components/ui/button";
 import SpinnerSvg from "@/components/svg/spinner";
 import { PreviewTable } from "./previewTable";
-import { selectedCellColor } from "@/lib/defaultConstants";
 
-import { IReadSelectedCellsProps } from "../type";
+import { selectedCellColor } from "@/lib/defaultConstants";
 import { post } from "@/lib/helpers/fetch.helper";
+import { useToast } from "@/lib/hooks/use-toast";
+import { IReadSelectedCellsProps } from "../type";
 
 interface PreviewContaineProps {
   previewTable: string[][];
@@ -20,8 +22,7 @@ interface PreviewContaineProps {
   renderWorksheet: (worksheetNumber?: number) => void;
   setSelectedSheet: (value: SetStateAction<number>) => void;
   selectedSheet: number;
-  file: File | null;
-  isFileUploading: boolean;
+  fileName: string;
   workbookTotalSheets: number;
 }
 export function PreviewContainer({
@@ -30,16 +31,20 @@ export function PreviewContainer({
   renderWorksheet,
   setSelectedSheet,
   selectedSheet,
-  file,
-  isFileUploading,
+  fileName,
   workbookTotalSheets,
 }: PreviewContaineProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const [selectedRange, setSelectedRange] = useState<{
     initialRow?: number;
     initialCol?: number;
     finalRow?: number;
     finalCol?: number;
   } | null>(null);
+
+  const [isFileUploading, setIsFileUploading] = useState(false);
 
   const readSelectedCells = useCallback(
     ({ classList }: IReadSelectedCellsProps) => {
@@ -100,14 +105,35 @@ export function PreviewContainer({
         }
       }
 
-      console.log(rangeCells);
+      sendWorksheetRangeToApi(rangeCells);
     }
   };
 
   const sendWorksheetRangeToApi = (worksheetRange: string[]) => {
-    post("/upload-spreadsheet", {
+    setIsFileUploading(true);
+    post("/chat/upload-spreadsheet", {
       worksheetRange,
-    });
+    })
+      .then(async (response) => {
+        const data = await response.json();
+
+        if (data.success) {
+          toast({
+            description: "Chat iniciado, redirecionando...",
+            variant: "default",
+          });
+          router.push(`/chat/${data.chat_id}`);
+        }
+
+        if (data.error || data.detail) {
+          const erro = data.error || data.detail;
+          console.log(erro);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => setIsFileUploading(false));
   };
 
   return (
@@ -199,8 +225,6 @@ export function PreviewContainer({
           className={classNames(
             "w-[200px] bg-blue-600 ease-in-out mx-auto mt-10 ",
             {
-              "opacity-0 -translate-y-2 ": !file,
-              "opacity-1 translate-y-5 ": file,
               "animate-pulse": isFileUploading,
             }
           )}
@@ -218,10 +242,11 @@ export function PreviewContainer({
         </Button>
       </div>
 
+      {/* SEPARATOR */}
       <div className="w-[2px] h-[50%] bg-muted mx-4" />
 
       <PreviewTable
-        fileName={file?.name as string}
+        fileName={fileName}
         previewTable={previewTable}
         setSelectedRange={setSelectedRange}
         selectedRange={selectedRange}
