@@ -28,19 +28,15 @@ export function ChatMessages({
   useEffect(() => {
     const getInitialMessages = async () => {
       setIsLoadingInitialMsgs(true);
-      post("/chat/getMessages", {
+      post("/chat/get-chat-messages", {
         chat_id: chatId,
       })
         .then(async (res) => await res.json())
         .then((data) => {
-          setMessages((prev: ChatMessage[]) => [
-            ...prev,
-            {
-              content: `${data.message} \n\n ⛳ Dica: ${data.instructions}`,
-              role: "assistant",
-              id: Math.random().toString(),
-            },
-          ]);
+          const msgs = data.msgs;
+
+          console.log(msgs);
+          setMessages([...msgs]);
         })
         .catch((err) => {
           console.log(err);

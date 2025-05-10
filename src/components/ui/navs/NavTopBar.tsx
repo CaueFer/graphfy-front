@@ -12,8 +12,10 @@ import {
   Link,
   Button,
 } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 
 export default function NavTopBar() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const menuItems = [
@@ -60,7 +62,13 @@ export default function NavTopBar() {
           <Link href="/signup">Cadastrar</Link>
         </NavbarItem>
         <NavbarItem>
-          <Button color="default" href="/logn" variant="flat">
+          <Button 
+            color="default"
+            onClick={() => {
+              router.push("/login");
+            }}
+            variant="flat"
+          >
             Login
           </Button>
         </NavbarItem>

@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 import { ChatLayout } from "@/components/view/chat/chatLayout";
-import { post } from "@/lib/helpers/fetch.helper";
 
 export default async function ChatInterceptor({
   params,
@@ -16,12 +15,17 @@ export default async function ChatInterceptor({
 
   if (params?.c_id) {
     try {
-      const res = await post("/chat/get-chat", {
-        chat_id: params?.c_id,
+      const res = await fetch("/chat/get-chat", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ chat_id: params?.c_id }),
       });
 
       const data = await res.json();
       if (!data.success) {
+        console.error(data.detail || data.error);
         redirect("/chat");
       }
     } catch (err) {
