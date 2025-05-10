@@ -1,11 +1,11 @@
 import { ComponentProps } from "react";
 
-function SpinnerSvg(props: ComponentProps<"svg">) {
+function SpinnerSvg({ className, ...props }: ComponentProps<"svg">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      className="animate-spin"
+      className={`animate-spin ${className}`}
       viewBox="0 0 24 24"
       {...props}
     >
