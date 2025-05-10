@@ -1,10 +1,17 @@
 import { jwtVerify } from "jose";
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "segredo_default"
+  process.env.NEXT_PUBLIC_JWT_SECRET || "segredo_default"
 );
 
 export async function decodeJWT(token: string) {
-  const decoded = await jwtVerify(token, JWT_SECRET);
-  return decoded.payload;
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET, {
+      algorithms: ["HS256"],
+    });
+    return payload;
+  } catch (error) {
+    console.error("Erro ao verificar o token JWT:", error);
+    return null;
+  }
 }
