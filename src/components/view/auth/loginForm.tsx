@@ -52,8 +52,12 @@ export function LoginForm({
           setLogged(true);
 
           cookie.set("token", data.token);
-          router.push("/chat");
-          setisLoading(false);
+
+          setTimeout(() => {
+            setisLoading(false);
+
+            router.push("/chat");
+          }, 1500);
         }
 
         if (res.status >= 400) {
