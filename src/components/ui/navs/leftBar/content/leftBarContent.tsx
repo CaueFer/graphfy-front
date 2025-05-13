@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 interface LeftBarContentProps {
   smallMenu: boolean;
   user: User | null;
+  setChats: React.Dispatch<React.SetStateAction<Chat[]>>;
   chatId: string | undefined;
   chats?: Chat[];
 }
@@ -23,6 +24,7 @@ export function LeftBarContent({
   user,
   chatId,
   chats = [],
+  setChats,
 }: LeftBarContentProps) {
   return (
     <NavbarContent
@@ -72,7 +74,7 @@ export function LeftBarContent({
           {user && chats?.length > 0 && (
             <div className="flex flex-col items-center justify-center gap-2 w-full">
               {chats.map((chat) => (
-                <ChatItem key={chat.id} chat={chat} activeChatId={chatId} />
+                <ChatItem key={chat.id} chat={chat} setChats={setChats} activeChatId={chatId} />
               ))}
             </div>
           )}

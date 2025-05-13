@@ -75,6 +75,7 @@ export default function NavLeftBar({
       <LeftBarContent
         chatId={chatId}
         chats={chats}
+        setChats={setChats}
         user={user}
         smallMenu={smallMenu}
       />
