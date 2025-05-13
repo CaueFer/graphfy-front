@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import classNames from "classnames";
 
 import { ChatInput } from "@/components/ui/ChatInput";
-import NavLeftBar from "@/components/ui/navs/NavLeftBar";
+import NavLeftBar from "@/components/ui/navs/leftBar/NavLeftBar";
 import { ChatMessages } from "./messages/chatMessages";
 import { NewChatPage } from "./newChatPage";
 

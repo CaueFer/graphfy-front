@@ -1,5 +1,12 @@
 "use client";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { Message } from "../Message";
 
@@ -34,8 +41,6 @@ export function ChatMessages({
         .then(async (res) => await res.json())
         .then((data) => {
           const msgs = data.msgs;
-
-          console.log(msgs);
           setMessages([...msgs]);
         })
         .catch((err) => {
@@ -65,18 +70,16 @@ export function ChatMessages({
       {messages.length > 0 && !isLoadingInitialMsgs && (
         <>
           {messages.map((message) => (
-            <>
-              <Message
-                key={message.id}
-                content={message.content}
-                isUserMessage={message.role === "user"}
-                isErrorMessage={message.role === "error"}
-                isLoadingMessage={message.role === "loading"}
-              />
-            </>
+            <Message
+              key={message.id}
+              content={message.content}
+              isUserMessage={message.role === "user"}
+              isErrorMessage={message.role === "error"}
+              isLoadingMessage={message.role === "loading"}
+            />
           ))}
           {isLoadingMessage && (
-            <>
+            <Fragment key={`loading-${Date.now()}`}>
               {messageStatus != "" && (
                 <div className="px-6 ">
                   <div className="max-w-3xl mx-auto flex items-start">
@@ -84,18 +87,18 @@ export function ChatMessages({
                   </div>
                 </div>
               )}
-              <Message
-                key={`loading-${Date.now()}`}
-                content={"loading"}
-                isUserMessage={false}
-              />
-            </>
+              <Message content={"loading"} isUserMessage={false} />
+            </Fragment>
           )}
         </>
       )}
 
       {/* LOADER MSGS */}
-      {isLoadingInitialMsgs && <SpinnerSvg className="size-4" />}
+      {isLoadingInitialMsgs && (
+        <div className="w-full h-full flex justify-center items-center">
+          <SpinnerSvg className="size-6" />
+        </div>
+      )}
     </div>
   );
 }

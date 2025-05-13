@@ -10,11 +10,13 @@ import {
 } from "@nextui-org/react";
 import { Grape, PanelLeftClose, PanelRightClose } from "lucide-react";
 
-import { LeftBarContent } from "./leftBarContent";
-import { LeftBarBottom } from "./leftBarBottom";
+import { LeftBarBottom } from "./bottom/leftBarBottom";
+import { LeftBarContent } from "./content/leftBarContent";
+
 import { clientCookie } from "@/lib/hooks/getClientCookie";
 import { decodeJWT } from "@/lib/helpers/jwt.helper";
-import { User } from "@/lib/global.types";
+import { get } from "@/lib/helpers/fetch.helper";
+import { Chat, User } from "@/lib/global.types";
 
 interface NavLeftBar {
   setSmallMenu: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,19 +27,33 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
 
   const [user, setUser] = useState<User | null>(null);
 
+  const [chats, setChats] = useState<Chat[]>([]);
+
   useEffect(() => {
     const token = clientCookie().get("token");
 
-    const getToken = async (token: string) => {
+    const getTokenPayload = async (token: string) => {
       const payload = await decodeJWT(token);
 
       if (payload) setUser(payload.user as User);
     };
 
     if (token) {
-      getToken(token);
+      getTokenPayload(token);
     }
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const getChatsHistory = async () => {
+      get(`/chat/get-user-chats?user_id=${user?.id}`)
+        .then((res) => res.json())
+        .then((data) => setChats(data?.chats))
+        .catch((err) => console.log(err));
+    };
+
+    getChatsHistory();
+  }, [user]);
 
   return (
     <Navbar
@@ -50,14 +66,14 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
         wrapper: ["py-4 h-full flex flex-col justify-between items-center"],
       }}
     >
-      {/* XS BREAK POINT */}
+      {/* TOP XS BREAK POINT */}
       <NavbarContent className="sm:hidden" justify="start">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         />
       </NavbarContent>
 
-      {/* SM BREAK POINT */}
+      {/* TOP SM BREAK POINT */}
       <NavbarContent
         className="hidden sm:flex gap-4 h-10 w-full flex-row justify-around"
         justify="center"
@@ -86,7 +102,7 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
 
       {/* NAV CONTENT */}
       <NavbarContent className="w-full gap-4 h-10 text-white" justify="center">
-        <LeftBarContent user={user} smallMenu={smallMenu} />
+        <LeftBarContent chats={chats} user={user} smallMenu={smallMenu} />
       </NavbarContent>
 
       {/* BOTTOM */}

@@ -6,7 +6,7 @@ import {
   CommandGroup,
   CommandList,
   CommandSeparator,
-} from "../command";
+} from "@/components/ui/command";
 import { clientCookie } from "@/lib/hooks/getClientCookie";
 import { useRouter } from "next/navigation";
 

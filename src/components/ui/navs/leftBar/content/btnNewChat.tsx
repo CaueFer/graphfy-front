@@ -1,9 +1,14 @@
+"use client";
+import { useRouter } from "next/router";
+
 import { DiamondPlus } from "lucide-react";
 
-interface BtnNewChatProps {
-  handleNewChat: () => void;
-}
-export function BtnNewChat({ handleNewChat }: BtnNewChatProps) {
+export function BtnNewChat() {
+  const router = useRouter();
+
+  const handleNewChat = () => {
+    router.push("/chat");
+  };
   return (
     <span
       className="group flex flex-row justify-center items-center px-4 py-2 rounded-md border border-muted hover:bg-muted/20 cursor-pointer shadow min-w-[170px] select-none"

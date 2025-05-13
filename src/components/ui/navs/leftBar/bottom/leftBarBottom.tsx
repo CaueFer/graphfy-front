@@ -10,7 +10,7 @@ import { LeftBarBottomModel } from "./leftBarBottomModal";
 import { cn } from "@/lib/utils";
 
 const NavConfigModal = lazy(() => {
-  return import("./navConfigModal");
+  return import("../../navConfigModal");
 });
 
 interface LeftBarBottomProps {
