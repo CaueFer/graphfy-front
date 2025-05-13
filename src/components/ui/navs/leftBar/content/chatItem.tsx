@@ -4,6 +4,7 @@ import { Ellipsis } from "lucide-react";
 import { ChatItemModal } from "./chatItemModal";
 import { Chat } from "@/lib/global.types";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface ChatItemProps extends ComponentPropsWithoutRef<"div"> {
   chat: Chat;
@@ -11,6 +12,13 @@ interface ChatItemProps extends ComponentPropsWithoutRef<"div"> {
 }
 
 export function ChatItem({ activeChatId, chat, ...props }: ChatItemProps) {
+  const router = useRouter();
+
+  const handleChatClick = () => {
+    if (activeChatId === String(chat.id)) return;
+    router.push(`/chat/${chat.id}`);
+  };
+
   return (
     <div
       key={chat.id}
@@ -21,6 +29,7 @@ export function ChatItem({ activeChatId, chat, ...props }: ChatItemProps) {
           "bg-muted/30": activeChatId === String(chat.id),
         }
       )}
+      onClick={() => handleChatClick()}
       {...props}
     >
       <span>{chat.name}</span>

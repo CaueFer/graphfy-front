@@ -17,11 +17,11 @@ export function ChatItemModal({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent {...props}>
+      <DropdownMenuContent className="dark bg-zinc-900 shadow-lg" {...props}>
         <DropdownMenuItem>
           <Pencil /> Renomear
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem className="text-red-400">
           <Trash /> Apagar
         </DropdownMenuItem>
       </DropdownMenuContent>
