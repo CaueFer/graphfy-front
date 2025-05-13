@@ -20,10 +20,8 @@ interface ChatLayoutProps {
 export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
 
-  const [leftBarOpen, setLeftBarOpen] = useState(false);
   const [smallMenu, setSmallMenu] = useState(false);
 
-  const [disableChatInput, setDisableChatInput] = useState(false);
   const [input, setInput] = useState<string>("");
 
   const [formattedMessages, setFormattedMessages] = useState<ChatMessage[]>([]);
@@ -31,13 +29,6 @@ export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
   const [messageStatus, setMessageStatus] = useState<string>("");
 
   const [file, setFile] = useState<File | null>(null);
-
-  useEffect(() => {
-    setDisableChatInput(false);
-
-    const timer = setTimeout(() => setLeftBarOpen(true), 400);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const message = messages.at(-1);
@@ -138,9 +129,8 @@ export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
       {/* LEFT BAR */}
       <div
         className={classNames(
-          "min-h-full relative transition-all duration-500 ease-out -translate-x-[100%] bg-zinc-900 shadow z-20",
+          "min-h-full relative transition-all duration-500 ease-out  translate-x-0  bg-zinc-900 shadow z-20",
           {
-            "translate-x-0 ": leftBarOpen,
             "w-[10vh]": smallMenu,
             "w-[285px] ": !smallMenu,
           }
@@ -191,7 +181,7 @@ export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
               ? "Envie sua planilha para iniciar o chat!"
               : "Pergunte ao Graphfy..."
           }
-          disable={disableChatInput || formattedMessages.length < 1}
+          disable={formattedMessages.length < 1}
         />
       </div>
     </div>

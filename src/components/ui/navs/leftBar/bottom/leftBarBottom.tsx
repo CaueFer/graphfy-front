@@ -1,13 +1,14 @@
 import { lazy, useEffect, useRef, useState } from "react";
-
-import { SlidersVertical, User as UserIcon } from "lucide-react";
-import { NavbarItem } from "@nextui-org/navbar";
-import { Button } from "@nextui-org/react";
 import Link from "next/link";
 
-import { User } from "@/lib/global.types";
+import { SlidersVertical, User as UserIcon } from "lucide-react";
+import { NavbarContent, NavbarItem } from "@nextui-org/navbar";
+import { Button } from "@nextui-org/react";
+
 import { LeftBarBottomModel } from "./leftBarBottomModal";
+
 import { cn } from "@/lib/utils";
+import { User } from "@/lib/global.types";
 
 const NavConfigModal = lazy(() => {
   return import("../../navConfigModal");
@@ -41,7 +42,7 @@ export function LeftBarBottom({ user, smallMenu }: LeftBarBottomProps) {
   }, []);
 
   return (
-    <>
+    <NavbarContent justify="center" className="h-10 py-10 w-full">
       {smallMenu && !user && (
         <NavbarItem className="relative flex">
           <SlidersVertical
@@ -105,6 +106,6 @@ export function LeftBarBottom({ user, smallMenu }: LeftBarBottomProps) {
           <LeftBarBottomModel />
         </div>
       )}
-    </>
+    </NavbarContent>
   );
 }

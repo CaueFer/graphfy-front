@@ -1,14 +1,16 @@
 "use client";
+
+import { NavbarContent } from "@nextui-org/navbar";
 import { GalleryVerticalEnd } from "lucide-react";
-import { NavbarItem } from "@nextui-org/navbar";
 import { Tooltip } from "@nextui-org/react";
 
 import { Button as ButtonSd } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { BtnNewChat } from "./btnNewChat";
 import { ChatItem } from "./chatItem";
 
 import { Chat, User } from "@/lib/global.types";
-import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface LeftBarContentProps {
   smallMenu: boolean;
@@ -19,69 +21,66 @@ interface LeftBarContentProps {
 export function LeftBarContent({
   smallMenu,
   user,
-  chats,
   chatId,
+  chats = [],
 }: LeftBarContentProps) {
   return (
-    <NavbarItem className="w-full flex flex-col text-center justify-center items-center truncate gap-4">
-      <Tooltip
-        content={
-          <p className="text-black text-md text-pretty">
-            Suas conversas.
-            {!user && (
-              <span>
-                Faça
-                <ButtonSd
-                  variant="link"
-                  role="link"
-                  className="cursor-pointer px-1"
-                >
-                  LOGIN
-                </ButtonSd>
-                para ver histórico.
-              </span>
-            )}
-          </p>
-        }
-        placement="right"
-      >
-        <GalleryVerticalEnd className="size-10 text-white" />
-      </Tooltip>
-
-      {!smallMenu && (
-        <h3 className="font-semibold text-xl text-white ">Suas conversas</h3>
+    <NavbarContent
+      className={cn(
+        "w-full flex flex-col gap-4 mt-[230px] text-white transition-all duration-400 ease-in-out"
       )}
+      justify="start"
+    >
+      {/* PARTE DE CIMA */}
+      <div className="w-full flex flex-col text-center items-center justify-start truncate gap-4">
+        <Tooltip
+          content={
+            <p className="text-black text-md text-pretty">
+              Suas conversas.
+              {!user && (
+                <span>
+                  Faça
+                  <ButtonSd
+                    variant="link"
+                    role="link"
+                    className="cursor-pointer px-1"
+                  >
+                    LOGIN
+                  </ButtonSd>
+                  para ver histórico.
+                </span>
+              )}
+            </p>
+          }
+          placement="right"
+        >
+          <GalleryVerticalEnd className="size-10 text-white" />
+        </Tooltip>
 
-      {/* FACA LOGIN PARA VER CHATS */}
-      {!smallMenu && !user && (
-        <>
-          <p className="text-zinc-400 text-md text-pretty">
-            Faça
-            <ButtonSd
-              variant="link"
-              role="link"
-              className="cursor-pointer px-1"
-            >
-              LOGIN
-            </ButtonSd>
-            para ver histórico.
-          </p>
-        </>
-      )}
+        {!smallMenu && (
+          <h3 className="font-semibold text-xl text-white ">Suas conversas</h3>
+        )}
 
-      {/* BTN NOVA CONVERSA */}
-      {!smallMenu && user && <BtnNewChat />}
+        {/* BTN NOVA CONVERSA */}
+        <BtnNewChat smallMenu={smallMenu} />
+      </div>
 
       {/* CHATS */}
-      {!smallMenu && user && chats && chats?.length > 0 && (
-        <div className="flex flex-col items-center justify-center gap-2 w-full">
-          <Separator className="my-4" />
-
-          {chats.map((chat) => (
-            <ChatItem key={chat.id} chat={chat} activeChatId={chatId} />
-          ))}
+      {!smallMenu && (
+        <div className="w-full flex flex-col text-center items-center justify-start truncate gap-4">
+          {<Separator className="my-4" />}
+          {user && chats?.length > 0 && (
+            <div className="flex flex-col items-center justify-center gap-2 w-full">
+              {chats.map((chat) => (
+                <ChatItem key={chat.id} chat={chat} activeChatId={chatId} />
+              ))}
+            </div>
+          )}
+          {chats?.length < 1 && (
+            <p className="text-sm ">Suas conversas ficaram aqui.</p>
+          )}
         </div>
       )}
-    </NavbarItem>
+    </NavbarContent>
   );
 }
