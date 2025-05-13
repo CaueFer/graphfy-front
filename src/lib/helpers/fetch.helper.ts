@@ -4,6 +4,16 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http:localhost:5000/api";
 
 const token = clientCookie().get("token");
 
+export function get(endpoint: string) {
+  return fetch(API_URL + endpoint, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
 export function post(
   endpoint: string,
   body: Record<string, unknown> | undefined
@@ -18,9 +28,9 @@ export function post(
   });
 }
 
-export function get(endpoint: string) {
+export function delet(endpoint: string) {
   return fetch(API_URL + endpoint, {
-    method: "GET",
+    method: "DELETE",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
