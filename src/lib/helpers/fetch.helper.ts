@@ -17,3 +17,13 @@ export function post(
     body: JSON.stringify(body),
   });
 }
+
+export function get(endpoint: string) {
+  return fetch(API_URL + endpoint, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
