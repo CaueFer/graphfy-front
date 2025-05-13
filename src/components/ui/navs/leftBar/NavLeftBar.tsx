@@ -21,8 +21,13 @@ import { Chat, User } from "@/lib/global.types";
 interface NavLeftBar {
   setSmallMenu: React.Dispatch<React.SetStateAction<boolean>>;
   smallMenu: boolean;
+  chatId: string | undefined;
 }
-export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
+export default function NavLeftBar({
+  setSmallMenu,
+  smallMenu,
+  chatId,
+}: NavLeftBar) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [user, setUser] = useState<User | null>(null);
@@ -102,7 +107,12 @@ export default function NavLeftBar({ setSmallMenu, smallMenu }: NavLeftBar) {
 
       {/* NAV CONTENT */}
       <NavbarContent className="w-full gap-4 h-10 text-white" justify="center">
-        <LeftBarContent chats={chats} user={user} smallMenu={smallMenu} />
+        <LeftBarContent
+          chatId={chatId}
+          chats={chats}
+          user={user}
+          smallMenu={smallMenu}
+        />
       </NavbarContent>
 
       {/* BOTTOM */}

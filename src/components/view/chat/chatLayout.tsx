@@ -146,7 +146,11 @@ export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
           }
         )}
       >
-        <NavLeftBar setSmallMenu={setSmallMenu} smallMenu={smallMenu} />
+        <NavLeftBar
+          setSmallMenu={setSmallMenu}
+          smallMenu={smallMenu}
+          chatId={chatId}
+        />
       </div>
 
       <div className="relative min-h-full flex-grow bg-zinc-900 flex divide-y divide-zinc-700 flex-col justify-between gap-2 ">

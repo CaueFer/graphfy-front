@@ -1,22 +1,23 @@
 "use client";
 
-import { Dispatch, SetStateAction } from "react";
+import { type ComponentPropsWithoutRef } from "react";
 import { Pencil, Trash } from "lucide-react";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface ChatItemModalProps {
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-}
-export function ChatItemModal({ open, setOpen }: ChatItemModalProps) {
+export function ChatItemModal({
+  children,
+  ...props
+}: ComponentPropsWithoutRef<"div">) {
   return (
-    <DropdownMenu open={open} onOpenChange={(open) => setOpen(open)}>
-      <DropdownMenuContent>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent {...props}>
         <DropdownMenuItem>
           <Pencil /> Renomear
         </DropdownMenuItem>
