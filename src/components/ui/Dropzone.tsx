@@ -17,9 +17,12 @@ export const DefaultDropzone = React.forwardRef<
   HTMLDivElement,
   DefaultDropzoneProps
 >(({ setFile, file, disabled = false }, ref) => {
-  const onDrop = useCallback((acceptedFiles: any[]) => {
-    setFile(acceptedFiles[0]);
-  }, []);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setFile(acceptedFiles[0]);
+    },
+    [setFile]
+  );
 
   const { fileRejections, getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -31,7 +34,7 @@ export const DefaultDropzone = React.forwardRef<
     <div
       ref={ref}
       className={classNames(
-        "relative p-4 flex justify-center items-center rounded-lg w-[550px] h-[160px] border border-blue-400  hover:bg-blue-400/[0.05] text-white text-sm  select-none group ",
+        "relative p-4 flex justify-center items-center rounded-lg w-[550px] h-[160px] border border-blue-400 shadow-lg hover:shadow-xl  hover:bg-blue-400/[0.05] text-white text-sm  select-none group z-20 transition-shadow duration-200 ease-in-out",
         { "bg-black/30 hover:bg-black/30 cursor-default": disabled }
       )}
     >
@@ -96,3 +99,5 @@ export const DefaultDropzone = React.forwardRef<
     </div>
   );
 });
+
+DefaultDropzone.displayName = "DefaultDropzone";
