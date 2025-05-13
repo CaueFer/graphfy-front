@@ -128,7 +128,7 @@ export const NewChatPage = ({
             Envie sua planilha para gerar seus primeiros gráficos.
           </p>
 
-          <div className="w-full flex flex-col justify-center items-center gap-5 mt-5">
+          <div className="relative w-full flex flex-col justify-center items-center gap-5 mt-5">
             <DefaultDropzone
               ref={dropzoneRef}
               setFile={setFile}
@@ -136,28 +136,26 @@ export const NewChatPage = ({
               disabled={isRender}
             />
 
-            {file && (
-              <Button
-                color="primary"
-                variant="flat"
-                onClick={() => handleLoadPreviewTable()}
-                className={classNames(" bg-blue-600  ease-in-out ", {
-                  "opacity-0 -translate-y-2 ": !file,
-                  "opacity-1 translate-y-5 ": file,
-                  "animate-pulse": isLoadingPrewiew,
-                })}
-                disabled={isLoadingPrewiew}
-              >
-                {!isLoadingPrewiew ? (
-                  "Carregar Planilha"
-                ) : (
-                  <>
-                    Carregando
-                    <SpinnerSvg />
-                  </>
-                )}
-              </Button>
-            )}
+            <Button
+              color="primary"
+              variant="flat"
+              onClick={() => handleLoadPreviewTable()}
+              className={classNames(" bg-blue-600  ease-in-out transition-all duration-400 ease z-10", {
+                "opacity-0 -translate-y-[150%] ": !file,
+                "opacity-1 translate-y-5 ": file,
+                "animate-pulse": isLoadingPrewiew,
+              })}
+              disabled={isLoadingPrewiew}
+            >
+              {!isLoadingPrewiew ? (
+                "Carregar Planilha"
+              ) : (
+                <>
+                  Carregando
+                  <SpinnerSvg />
+                </>
+              )}
+            </Button>
           </div>
         </div>
       )}

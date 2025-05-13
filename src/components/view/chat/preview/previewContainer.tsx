@@ -1,7 +1,7 @@
 "use client";
 
 import { SetStateAction, useCallback, useEffect, useState } from "react";
-import { TableProperties } from "lucide-react";
+import { MoveLeft, TableProperties } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nextui-org/react";
 import classNames from "classnames";
@@ -139,6 +139,10 @@ export function PreviewContainer({
   return (
     <div className="relative flex-1 flex flex-row items-center justify-center p-10 overflow-hidden">
       <div className="flex flex-col items-start justify-center gap-2">
+        <ButtonSd variant="link" className="p-1 mb-4">
+          <MoveLeft />
+          voltar
+        </ButtonSd>
         <TableProperties className="size-10 text-blue-500" />
         <h3 className="font-semibold text-2xl text-white">
           Pré visualização da Planilha
