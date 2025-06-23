@@ -8,11 +8,11 @@ import {
   useState,
 } from "react";
 
+import SpinnerSvg from "@/components/svg/spinner";
 import { Message } from "../Message";
 
 import { post } from "@/lib/helpers/fetch.helper";
 import { ChatMessage } from "../type";
-import SpinnerSvg from "@/components/svg/spinner";
 
 interface ChatMessageProps {
   isLoadingMessage: boolean;
@@ -38,7 +38,12 @@ export function ChatMessages({
       post("/chat/get-chat-messages", {
         chat_id: chatId,
       })
-        .then(async (res) => await res.json())
+        .then(async (res) => {
+          // DELAY FAKE - SIMULAR NETWORK RUIM
+          await new Promise<void>((resolve) => setTimeout(resolve, 2000));
+
+          return await res.json();
+        })
         .then((data) => {
           const msgs = data.msgs;
           setMessages([...msgs]);
@@ -73,11 +78,14 @@ export function ChatMessages({
             <Message
               key={message.id}
               content={message.content}
+              graphTitle={message.graphTitle}
+              columns={message.columns}
               isUserMessage={message.role === "user"}
               isErrorMessage={message.role === "error"}
-              isLoadingMessage={message.role === "loading"}
+              isGraphMessage={message.role === "graph"}
             />
           ))}
+
           {isLoadingMessage && (
             <Fragment key={`loading-${Date.now()}`}>
               {messageStatus != "" && (
@@ -93,7 +101,7 @@ export function ChatMessages({
         </>
       )}
 
-      {/* LOADER MSGS */}
+      {/* LOADER INITIAL MSGS */}
       {isLoadingInitialMsgs && (
         <div className="w-full h-full flex justify-center items-center">
           <SpinnerSvg className="size-6" />

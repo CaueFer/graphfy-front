@@ -2,9 +2,9 @@ import { clientCookie } from "../hooks/getClientCookie";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http:localhost:5000/api";
 
-const token = clientCookie().get("token");
-
 export function get(endpoint: string) {
+  const token = clientCookie().get("token");
+
   return fetch(API_URL + endpoint, {
     method: "GET",
     headers: {
@@ -18,6 +18,8 @@ export function post(
   endpoint: string,
   body: Record<string, unknown> | undefined
 ) {
+  const token = clientCookie().get("token");
+
   return fetch(API_URL + endpoint, {
     method: "POST",
     headers: {
@@ -29,6 +31,8 @@ export function post(
 }
 
 export function delet(endpoint: string) {
+  const token = clientCookie().get("token");
+
   return fetch(API_URL + endpoint, {
     method: "DELETE",
     headers: {

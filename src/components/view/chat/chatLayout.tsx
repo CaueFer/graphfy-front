@@ -11,13 +11,13 @@ import { ChatMessages } from "./messages/chatMessages";
 import { NewChatPage } from "./newChatPage";
 
 import { useMessages } from "@/lib/hooks/useMessages";
+import { post } from "@/lib/helpers/fetch.helper";
 import { ChatMessage } from "./type";
 
 interface ChatLayoutProps {
-  token: string | null;
   chatId?: string;
 }
-export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
+export const ChatLayout = ({ chatId }: ChatLayoutProps) => {
   const [isLoadingMessage, setIsLoadingMessage] = useState(false);
 
   const [smallMenu, setSmallMenu] = useState(false);
@@ -30,20 +30,23 @@ export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
 
   const [file, setFile] = useState<File | null>(null);
 
+  // FORMAT MESSAGES
   useEffect(() => {
-    const message = messages.at(-1);
+    const formattedMessages: ChatMessage[] = [];
 
-    if (message != null) {
-      if (message?.role !== "user") setIsLoadingMessage(false);
-
-      const content = message.content
-        .replace(/\*\*(.*?)\*\*/g, "<h2>$1</h2>")
-        .replace(/\n/g, "<br />")
-        .replace(/\*(.*?)\*/g, "<strong>$1</strong>");
+    messages.forEach((message) => {
+      const content = message?.content
+        ? message.content
+            .replace(/\*\*(.*?)\*\*/g, "<h2>$1</h2>")
+            .replace(/\n/g, "<br />")
+            .replace(/\*(.*?)\*/g, "<strong>$1</strong>")
+        : "";
       const formattedMessage = { ...message, content };
 
-      setFormattedMessages((prev) => [...prev, formattedMessage]);
-    }
+      formattedMessages.push(formattedMessage);
+    });
+
+    setFormattedMessages(formattedMessages);
   }, [messages]);
 
   // ATUALIZA FRONT
@@ -65,16 +68,11 @@ export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
     setIsLoadingMessage(true);
     try {
       // DELAY FAKE
-      await new Promise((resolve) =>
-        setTimeout(resolve, 10000 * Math.random())
-      );
+      await new Promise((resolve) => setTimeout(resolve, 5000 * Math.random()));
 
-      await fetch(process.env.NEXT_PUBLIC_API_URL + "/start-chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt, sessionId: token }),
+      await post("/chat/start-chat", {
+        prompt: prompt,
+        chat_id: chatId,
       }).then((response) => {
         const reader = response.body?.getReader();
         const decoder = new TextDecoder("utf-8");
@@ -92,20 +90,24 @@ export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
 
             status.forEach((s) => {
               const data = JSON.parse(s);
-
               if (data?.status != null) setMessageStatus(data.status);
-              else if (data?.error != null) addMessage(data.error, "error");
-              //FAZER UM TOAST PARA O ERRO
 
-              if (data?.success) {
-                setMessages((prev: ChatMessage[]) => [
-                  ...prev,
-                  {
-                    content: "recebi a mensagem!",
-                    role: "assistant",
-                    id: Math.random().toString(),
-                  },
-                ]);
+              if (data?.error != null) {
+                setIsLoadingMessage(false);
+                addMessage(data.error, "error");
+              }
+
+              if (data?.message) {
+                setIsLoadingMessage(false);
+
+                if (data?.graphTitle)
+                  addMessage(
+                    data?.message,
+                    "graph",
+                    data?.graphTitle,
+                    data?.columns
+                  );
+                else addMessage(data?.message, "assistant");
               }
             });
 
@@ -117,10 +119,9 @@ export const ChatLayout = ({ token, chatId }: ChatLayoutProps) => {
       });
     } catch (error) {
       console.error("Erro ao enviar a mensagem:", error);
+      setIsLoadingMessage(false);
 
       addMessage("Erro ao enviar mensagem!", "error");
-    } finally {
-      setIsLoadingMessage(false);
     }
   };
 

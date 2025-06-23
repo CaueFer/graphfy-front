@@ -70,9 +70,9 @@ export function LoginForm({
       .catch((err) => {
         console.error(err);
 
-        setisLoading(false);
         setLogged(false);
-      });
+      })
+      .finally(() => setisLoading(false));
   };
 
   return (
@@ -134,7 +134,7 @@ export function LoginForm({
                 </Button>
               </div>
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={logged}>
               {isLoading ? (
                 <>
                   <SpinnerSvg /> Carregando...

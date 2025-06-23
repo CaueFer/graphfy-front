@@ -37,5 +37,5 @@ export default async function ChatInterceptor({
     }
   }
 
-  return <ChatLayout key={token} token={token} chatId={params?.c_id} />;
+  return <ChatLayout key={token} chatId={params?.c_id} />;
 }

@@ -45,6 +45,7 @@ export function PreviewContainer({
   } | null>(null);
 
   const [isFileUploading, setIsFileUploading] = useState(false);
+  const [sended, setSended] = useState(false);
 
   const readSelectedCells = useCallback(
     ({ classList }: IReadSelectedCellsProps) => {
@@ -61,7 +62,7 @@ export function PreviewContainer({
           ? selectedRange?.finalCol
           : startCol;
 
-        // PASSA POR TODO O SELECTED RANGE E FAZ ALGO
+        // PASSA POR TODO O SELECTED RANGE
         for (let i = startRow; i <= endRow; i++) {
           for (let j = startCol; j <= endCol; j++) {
             const cell = document.getElementById(`col${j}-row${i}`);
@@ -118,6 +119,7 @@ export function PreviewContainer({
         const data = await response.json();
 
         if (data.success) {
+          setSended(true);
           toast({
             description: "Chat iniciado, redirecionando...",
             variant: "default",
@@ -233,14 +235,14 @@ export function PreviewContainer({
             }
           )}
           onClick={() => getWorksheetRange()}
-          disabled={isFileUploading}
+          disabled={isFileUploading || sended}
         >
           {!isFileUploading ? (
             "Enviar Intervalo"
           ) : (
             <>
               Enviando
-              <SpinnerSvg />
+              <SpinnerSvg className="size-2" />
             </>
           )}
         </Button>
