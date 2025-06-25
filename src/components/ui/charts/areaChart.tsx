@@ -81,7 +81,7 @@ export function AreaChartCard({
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 font-medium leading-none">
-              Exemplo teve um crescimeno de 5%{" "}
+              Crescimeno de 5%{" "}
               <TrendingUp className="h-4 w-4" />
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">

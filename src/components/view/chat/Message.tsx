@@ -66,7 +66,7 @@ export const Message = ({
           </div>
 
           <div className="font-normal py-2.5 text-gray-900 dark:text-white w-full">
-            {content === "loading" && <DotsLoader />}
+            {content === "loading" && <DotsLoader isUserMessage={isUserMessage} />}
 
             {content !== "loading" && (
               <>

@@ -89,8 +89,8 @@ export function ChatMessages({
           {isLoadingMessage && (
             <Fragment key={`loading-${Date.now()}`}>
               {messageStatus != "" && (
-                <div className="px-6 ">
-                  <div className="max-w-3xl mx-auto flex items-start">
+                <div className="px-6  ">
+                  <div className="max-w-3xl mx-auto flex items-start justify-start">
                     <h2 className="statusTextGradient">{messageStatus}</h2>
                   </div>
                 </div>
