@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat, Roboto } from "next/font/google";
+import { Roboto } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/Providers";
 import "../styles/globals.scss";
+import { Toaster } from "@/components/ui/toaster";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
           <main className="max-w-screen h-screen dark text-foreground bg-background relative ">
             {children}
           </main>
+          <Toaster />
         </Providers>
       </body>
     </html>

@@ -1,3 +1,6 @@
+<<<<<<< dev
+
+=======
 ## Projeto: GRAPHFY - Gráficos com IA
 **Integrante**: Caue Fernandes
 
@@ -92,3 +95,4 @@ O **GRAPHFY** é uma aplicação web inteligente que permite a leitura e anális
 
   Github - graphfy v1.3
 
+>>>>>>> master

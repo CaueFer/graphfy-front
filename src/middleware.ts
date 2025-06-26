@@ -1,13 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+"use server";
+import { type NextRequest, NextResponse } from "next/server";
 
-export function middleware(req: NextRequest) {
-    const res = NextResponse.next();
+export function middleware(request: NextRequest) {
+  const cookie = request.cookies.get("token");
 
-    const cookie = req.cookies.get("sessionId");
+  if (!cookie) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
 
-    if(!cookie) {
-        res.cookies.set("sessionId", crypto.randomUUID());
-    }
-
-    return res
+  return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/chat/:path*", "/chat"],
+};

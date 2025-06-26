@@ -1,60 +1,25 @@
 "use client";
 
-import { ChatWrapper } from "@/components/chatWrapper";
-import { Message } from "ai";
-import React, { useEffect, useMemo, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import React, { useEffect, useState } from "react";
 
-interface ChatbotPageProps {}
+import { ChatLayout } from "@/components/view/chat/chatLayout";
+import { clientCookie } from "@/lib/hooks/getClientCookie";
 
-const ChatbotPage = ({}: ChatbotPageProps) => {
-  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+const ChatPage = () => {
+  const cookie = clientCookie();
 
-  const sessionId = useMemo(() => uuidv4().replace(/\//g, ""), []);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     try {
-      generateIAResume();
+      const token = cookie.get("token");
+      if (token) setToken(token);
     } catch (error) {
-      console.error("Erro ao reconstruir a URL:", error);
+      console.error("Erro get token:", error);
     }
-  }, []);
+  }, [cookie]);
 
-  useEffect(() => {
-    //console.log(initialMessages)
-  }, [initialMessages]);
-
-  const generateIAResume = async () => {
-    try {
-      setInitialMessages((prev: Message[]) => [
-        ...prev,
-        {
-          content:
-            "Olá bem vindo! Envie sua planilha para eu gerar os gráficos e tirar suas dúvidas.",
-          role: "assistant",
-          id: uuidv4(),
-        },
-      ]);
-    } catch (error) {
-      console.error("Erro ao gerar resumo:", error);
-      setInitialMessages((prev: Message[]) => [
-        ...prev,
-        {
-          content: "Erro ao processar sua mensagem. Tente novamente.",
-          role: "error",
-          id: uuidv4(),
-        },
-      ]);
-    }
-  };
-
-  return (
-    <ChatWrapper
-      key={sessionId}
-      sessionId={sessionId}
-      initialMessages={initialMessages}
-    />
-  );
+  return <ChatLayout key={token} token={token} />;
 };
 
-export default ChatbotPage;
+export default ChatPage;
